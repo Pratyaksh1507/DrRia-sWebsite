@@ -22,6 +22,7 @@ const MAP = {
   'SPF-50 Sunscreen Key Benefits.png': 'spf50-sunscreen-benefits',
   'Botanical SPF-50 Sunscreen Still Life.png': 'spf50-sunscreen-lifestyle',
   'Aloe Skincare Ingredient Label.png': 'spf50-sunscreen-label',
+  'dr-rias-collection-hero.jpg': 'dr-rias-collection-hero',
 };
 
 await mkdir(OUT, { recursive: true });

@@ -63,24 +63,24 @@ export default function HeroSection() {
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-md lg:max-w-none aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white/80 bg-white">
               <Image
-                src="/images/hydroboost-moisturizer-lifestyle-768.webp"
-                alt="Dr Ria's Hydroboost Face Moisturizer editorial showcase"
+                src="/images/dr-rias-collection-hero-768.webp"
+                alt="Dr Ria's Skin & Hair Care Collection — Complete product line on marble pedestal"
                 fill
                 priority={true}
                 fetchPriority="high"
                 sizes="(max-width: 768px) 100vw, 50vw"
                 placeholder="blur"
-                blurDataURL="data:image/webp;base64,UklGRroAAABXRUJQVlA4IK4AAADwBQCdASoUABQAPtFgqE+oJSOiKAgBABoJZgCdMoSCyKm/JQJ/22TTP2P0h3/o1UtcUURWgf9NQAD3iIstuK5wjcatyo2/wxPzRomivgUel2YYpVlwRhmuhPC0ZnIaoHHshWZv/0fwIm+MPDgCDjOQBBuq8bmO9oYFzojl20Xn+PoZT/YPTFpWvizt9en9z4iAwtExJaCLbOWZakM+GF6zt+K+IBZ+YYhDwbwPoAA="
+                blurDataURL="data:image/webp;base64,UklGRtwAAABXRUJQVlA4INAAAABwBACdASoUABQAPtFgqU+oJSOiKAgBABoJZgCsMy/luAHKI43+PioTSJWGAAD+uB/X/IHX53s43WoRScX2S7mV+oBJjpHkZB+2B3xsKMsXwx5+muFN4N/hgQ1ERHTim9T7ou6lC/oHLEolOF+ll8gLYhNEicJbF6+coAEQPGxbcVd2ZB9HNlTToXPWVyWMK1qH3h8ZcuabN0MtVBzsP5wBaQoO9ADJlGpJ93CZo1flOoe7usr827+URk1XPANs9X5fH8IFqv942AlxWhWRGAAA"
                 className="object-cover object-center"
               />
             </div>
             {/* Soft decorative badge */}
             <div className="absolute -bottom-4 -left-4 sm:bottom-4 sm:-left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-[#E8E0D5] max-w-[200px]">
               <span className="block text-[11px] font-bold uppercase tracking-wider text-[#7A532B]">
-                Thoughtfully Crafted
+                The Full Collection
               </span>
               <span className="block text-xs font-medium text-[#1A1A1A] mt-0.5">
-                Gentle on skin, purposeful daily care.
+                Skin &amp; Hair Care formulated for daily care.
               </span>
             </div>
           </div>

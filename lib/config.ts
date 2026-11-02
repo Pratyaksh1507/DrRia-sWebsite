@@ -14,3 +14,4 @@ export const STORE_CONFIG = {
   CUSTOMER_CARE_PHONE: '+91-9469088317',
   CUSTOMER_CARE_EMAIL: 'simplyria11@gmail.com',
 } as const;
+

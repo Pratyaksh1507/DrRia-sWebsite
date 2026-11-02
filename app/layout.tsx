@@ -54,10 +54,10 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/hydroboost-moisturizer-lifestyle-1200.webp',
+        url: '/images/dr-rias-collection-hero-1200.webp',
         width: 1200,
         height: 1200,
-        alt: "Dr Ria's Skincare Collection",
+        alt: "Dr Ria's Skincare & Haircare Collection",
       },
     ],
   },
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     title: "Dr Ria's — Skincare & Haircare, Made with Care in India",
     description:
       'Botanical extracts and thoughtful formulas crafted with care in India.',
-    images: ['/images/hydroboost-moisturizer-lifestyle-1200.webp'],
+    images: ['/images/dr-rias-collection-hero-1200.webp'],
   },
   robots: {
     index: true,
@@ -91,7 +91,7 @@ export default function RootLayout({
     '@type': 'Organization',
     name: "Dr Ria's",
     url: 'https://drrias.in',
-    logo: 'https://drrias.in/images/hydroboost-moisturizer-lifestyle-768.webp',
+    logo: 'https://drrias.in/images/dr-rias-collection-hero-768.webp',
     description:
       'Skincare and haircare formulated with botanical extracts and targeted ingredients, made with care in India.',
     contactPoint: {
