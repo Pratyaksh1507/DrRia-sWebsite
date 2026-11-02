@@ -1,0 +1,15 @@
+/* TEAM */
+Product Design & Marketing: Sachin Kashyap
+Website Design & Development: Pratyaksh Kalsi
+Brand: Dr Ria's
+Location: Jammu (J&K), India
+Contact: simplyria11@gmail.com / +91-9469088317
+
+/* SITE */
+Standards: HTML5, CSS3, WCAG 2.2 Level AA
+Framework: Next.js (App Router), React 19, TypeScript, Tailwind CSS
+Hosting: Vercel
+Images: WebP & AVIF with responsive resolutions via Sharp
+Typography: Playfair Display (Serif) & Inter (Sans)
+E-commerce: Client-persisted Zustand Cart & Razorpay Checkout Integration
+Last Updated: 2026
