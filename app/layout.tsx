@@ -44,6 +44,10 @@ export const metadata: Metadata = {
     'anti pigmentation lip balm',
     'botanical skincare',
   ],
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
   openGraph: {
     title: "Dr Ria's — Skincare & Haircare, Made with Care in India",
     description:
@@ -54,10 +58,10 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/dr-rias-collection-hero-1200.webp',
+        url: '/brand/og-default.png',
         width: 1200,
-        height: 1200,
-        alt: "Dr Ria's Skincare & Haircare Collection",
+        height: 630,
+        alt: "Dr Ria's",
       },
     ],
   },
@@ -66,7 +70,7 @@ export const metadata: Metadata = {
     title: "Dr Ria's — Skincare & Haircare, Made with Care in India",
     description:
       'Botanical extracts and thoughtful formulas crafted with care in India.',
-    images: ['/images/dr-rias-collection-hero-1200.webp'],
+    images: ['/brand/og-default.png'],
   },
   robots: {
     index: true,
@@ -91,7 +95,7 @@ export default function RootLayout({
     '@type': 'Organization',
     name: "Dr Ria's",
     url: 'https://drrias.in',
-    logo: 'https://drrias.in/images/dr-rias-collection-hero-768.webp',
+    logo: 'https://drrias.in/brand/dr-rias-logo.png',
     description:
       'Skincare and haircare formulated with botanical extracts and targeted ingredients, made with care in India.',
     contactPoint: {

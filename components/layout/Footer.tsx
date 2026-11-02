@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Logo from '@/components/Logo';
 
 export default function Footer() {
   return (
@@ -7,9 +8,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-[#5C3D1E]/60">
           {/* Brand Column */}
           <div className="space-y-4">
-            <h2 className="font-serif text-2xl font-bold tracking-tight text-[#FBF6EE]">
-              Dr Ria&apos;s
-            </h2>
+            <div className="pb-1">
+              <Logo variant="cream" className="h-10 w-auto object-contain" />
+            </div>
             <p className="text-xs sm:text-sm text-[#E8E0D5]/80 leading-relaxed">
               Skincare and haircare formulated with pure botanical extracts and targeted ingredients, crafted with care in India.
             </p>

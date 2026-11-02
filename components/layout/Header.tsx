@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCartStore } from '@/lib/cart';
+import Logo from '@/components/Logo';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -39,41 +40,13 @@ export default function Header() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Mobile menu trigger */}
-          <div className="flex items-center md:hidden">
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-[#5C3D1E] hover:bg-[#F3EBDD] focus:outline-none focus:ring-2 focus:ring-[#5C3D1E]"
-              aria-expanded={mobileMenuOpen}
-              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            >
-              {mobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
-            </button>
+        <div className="flex items-center justify-between h-20 gap-2">
+          {/* Brand Logo (Left) */}
+          <div className="flex items-center shrink-0">
+            <Logo />
           </div>
 
-          {/* Brand Wordmark / Logo */}
-          <div className="flex-1 md:flex-initial text-center md:text-left">
-            <Link href="/" className="inline-block group focus:outline-none">
-              <span className="block font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#5C3D1E] group-hover:text-[#C9952A] transition-colors">
-                Dr Ria&apos;s
-              </span>
-              <span className="block text-[10px] sm:text-xs font-sans tracking-[0.2em] uppercase text-[#7A532B] font-medium">
-                Pure &bull; Honest &bull; Transparent
-              </span>
-            </Link>
-          </div>
-
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation (Centered) */}
           <nav className="hidden md:flex items-center space-x-8" aria-label="Main Navigation">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
@@ -94,8 +67,8 @@ export default function Header() {
           </nav>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center space-x-3 sm:space-x-4">
-            {/* WhatsApp Support Button */}
+          <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+            {/* WhatsApp Support Button (Desktop / Tablet) */}
             <a
               href="https://wa.me/919469088317"
               target="_blank"
@@ -109,11 +82,11 @@ export default function Header() {
               <span>WhatsApp</span>
             </a>
 
-            {/* Tap to Call Link */}
+            {/* Tap to Call Link (Desktop / Tablet) */}
             <a
               href="tel:+919469088317"
               aria-label="Call Customer Care +91-9469088317"
-              className="p-2 text-[#5C3D1E] hover:text-[#C9952A] rounded-full hover:bg-[#F3EBDD] transition-colors"
+              className="hidden sm:inline-flex p-2 text-[#5C3D1E] hover:text-[#C9952A] rounded-full hover:bg-[#F3EBDD] transition-colors"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -141,6 +114,27 @@ export default function Header() {
                 </span>
               )}
             </button>
+
+            {/* Mobile Menu Trigger Button (Right on mobile) */}
+            <div className="flex items-center md:hidden">
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 rounded-lg text-[#5C3D1E] hover:bg-[#F3EBDD] focus:outline-none focus:ring-2 focus:ring-[#5C3D1E]"
+                aria-expanded={mobileMenuOpen}
+                aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              >
+                {mobileMenuOpen ? (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
