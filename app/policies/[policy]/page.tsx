@@ -70,19 +70,19 @@ const policyData: Record<
     sections: [
       {
         heading: '1. Information We Collect',
-        body: 'We collect information you explicitly provide during checkout, account creation, or newsletter sign-ups: full name, shipping and billing address, email address, mobile contact number, and PIN code. We do not store or process sensitive credit card numbers or banking passwords directly; all online transactions are securely handled by Razorpay.',
+        body: 'We collect information you explicitly provide during account registration, checkout, or customer support inquiries:\n• Full name, delivery and billing addresses, and PIN code for fulfillment.\n• Email address and mobile phone number for sending order receipts, live shipment updates, and OTP authentication.\n• Order history and saved addresses to provide a unified customer account portal.\nWe do not store or process sensitive credit/debit card numbers or CVVs on our servers.',
       },
       {
-        heading: '2. Use of Information',
-        body: 'Your information is strictly used to fulfill and dispatch orders, communicate live shipment tracking via SMS/WhatsApp, respond to customer inquiries, and send optional promotional newsletters if you have subscribed.',
+        heading: '2. Payment Security & Processing',
+        body: 'All online transactions are securely processed through Razorpay, a PCI-DSS Level 1 certified payment gateway. During checkout, your financial credentials are encrypted and transmitted directly to the payment gateway. Dr Ria’s receives only confirmation tokens and transaction identifiers required for fulfillment.',
       },
       {
-        heading: '3. Data Security & Third Parties',
-        body: 'We never sell, trade, or rent your personal data to external advertisers. Data is shared exclusively with necessary operating partners: logistics courier partners for delivery and Razorpay for payment processing.',
+        heading: '3. Use and Retention of Information',
+        body: 'Your information is strictly utilized to process and dispatch orders, communicate shipment tracking via SMS/WhatsApp, manage your customer account, and respond to inquiries. We never sell, rent, or trade your personal data to external advertisers.',
       },
       {
-        heading: '4. Cookies & Analytics',
-        body: 'Our website uses essential lightweight session cookies to maintain your shopping cart state in your local browser. We do not deploy invasive third-party ad retargeters by default.',
+        heading: '4. Cookies & Session Management',
+        body: 'Our platform uses essential httpOnly and Secure session cookies managed via Supabase Auth to keep you securely signed in and preserve your shopping cart state. These functional cookies do not track activity across third-party websites.',
       },
     ],
   },

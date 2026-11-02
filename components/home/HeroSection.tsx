@@ -63,7 +63,7 @@ export default function HeroSection() {
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-md lg:max-w-none aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white/80 bg-white">
               <Image
-                src="/images/dr-rias-collection-hero-768.webp"
+                src="/images/dr-rias-collection-hero-480.webp"
                 alt="Dr Ria's Skin & Hair Care Collection — Complete product line on marble pedestal"
                 fill
                 priority={true}

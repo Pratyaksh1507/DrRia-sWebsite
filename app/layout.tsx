@@ -1,3 +1,4 @@
+import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { Playfair_Display, Inter } from 'next/font/google';
 import './globals.css';
@@ -124,7 +125,16 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col font-sans bg-[#FBF6EE] text-[#1A1A1A] antialiased">
         <SkipToContent />
-        <Header />
+        <Suspense
+          fallback={
+            <header className="sticky top-0 z-40 w-full bg-[#FBF6EE]/95 border-b border-[#E8E0D5]">
+              <div className="bg-[#5C3D1E] h-[29px]" />
+              <div className="h-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" />
+            </header>
+          }
+        >
+          <Header />
+        </Suspense>
         <main id="main-content" className="flex-1 focus:outline-none">
           {children}
         </main>

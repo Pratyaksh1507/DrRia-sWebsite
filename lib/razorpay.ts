@@ -7,8 +7,8 @@ export interface RazorpayOptions {
   description: string;
   onSuccess: (response: {
     razorpay_payment_id: string;
-    razorpay_order_id?: string;
-    razorpay_signature?: string;
+    razorpay_order_id: string;
+    razorpay_signature: string;
   }) => void;
   onFailure: (error: any) => void;
 }
@@ -30,6 +30,7 @@ export function loadRazorpayScript(): Promise<boolean> {
 
 export async function processRazorpayPayment({
   amount,
+  orderId,
   name,
   email,
   contact,
@@ -39,19 +40,19 @@ export async function processRazorpayPayment({
 }: RazorpayOptions) {
   const isLoaded = await loadRazorpayScript();
   if (!isLoaded) {
-    onFailure(new Error('Failed to load Razorpay secure checkout SDK. Please try WhatsApp checkout.'));
+    onFailure(new Error('Failed to load Razorpay checkout SDK. Please try WhatsApp checkout or reload.'));
     return;
   }
 
   const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder';
 
-  const options = {
+  const options: Record<string, any> = {
     key: keyId,
     amount: Math.round(amount * 100), // paise
     currency: 'INR',
     name: "Dr Ria's",
     description,
-    image: 'https://drrias.in/images/hydroboost-moisturizer-benefits-480.webp',
+    image: '/brand/dr-rias-logo.png',
     prefill: {
       name,
       email,
@@ -63,10 +64,14 @@ export async function processRazorpayPayment({
     handler: onSuccess,
     modal: {
       ondismiss: () => {
-        onFailure(new Error('Checkout cancelled by user.'));
+        onFailure(new Error('Payment window closed.'));
       },
     },
   };
+
+  if (orderId) {
+    options.order_id = orderId;
+  }
 
   const rzp = new (window as any).Razorpay(options);
   rzp.open();

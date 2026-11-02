@@ -3,8 +3,22 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { useCartStore } from '@/lib/cart';
 import Logo from '@/components/Logo';
+
+// Dynamic import of UserNav ensures no heavy auth SDK bundle on home/shop/product pages
+const UserNav = dynamic(() => import('@/components/layout/UserNav'), {
+  ssr: false,
+  loading: () => (
+    <Link
+      href="/login"
+      className="text-xs font-semibold text-[#5C3D1E] hover:text-[#C9952A] transition-colors py-1.5 px-3 rounded-lg hover:bg-[#F3EBDD]"
+    >
+      Sign In
+    </Link>
+  ),
+});
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -93,6 +107,9 @@ export default function Header() {
               </svg>
             </a>
 
+            {/* User Account / Sign In Nav */}
+            <UserNav />
+
             {/* Shopping Cart Trigger Button */}
             <button
               type="button"
@@ -152,6 +169,13 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/account"
+              className="px-3 py-2 rounded-lg text-base font-semibold text-[#5C3D1E] hover:bg-[#F3EBDD] transition-colors flex items-center justify-between"
+            >
+              <span>My Account &amp; Orders</span>
+              <span>&rarr;</span>
+            </Link>
           </nav>
           <div className="pt-4 border-t border-[#E8E0D5] flex flex-col gap-2.5">
             <a
