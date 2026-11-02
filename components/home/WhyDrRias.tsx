@@ -1,21 +1,21 @@
 export default function WhyDrRias() {
   const pillars = [
     {
-      title: 'Dermatologist-Designed',
+      title: 'Targeted Ingredients',
       description:
-        'Crafted with clinical-grade active percentages and proven hydrators like Hyaluronic Acid, Ceramides, and Kojic Acid.',
+        'Formulated with purposeful actives including Hyaluronic Acid, Ceramides, Vitamin C, and nourishing botanical butters.',
       accent: '#4A7FA5',
     },
     {
-      title: 'Natural Actives & Pure Oils',
+      title: 'Transparent Formulations',
       description:
-        'Formulated with cold-pressed botanical oils (Bhringraj, Fenugreek, Amla, Jojoba) without dilution, parabens, or heavy petroleum fillers.',
+        'Every ingredient is clearly disclosed on our packaging with complete composition lists, directions, and patch-test guidelines.',
       accent: '#C9952A',
     },
     {
-      title: 'Made in India for Indian Climates',
+      title: 'Made in India',
       description:
-        'Engineered to resist humidity, non-greasy on oily zones, and deeply protective against tropical UV exposure and hard water.',
+        'Thoughtfully developed and manufactured in licensed facilities for everyday personal care routines across India.',
       accent: '#3A7D44',
     },
   ];
@@ -25,13 +25,13 @@ export default function WhyDrRias() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-xs font-bold tracking-widest uppercase text-[#7A532B]">
-            The Clinical Luxury Standard
+            Our Care Philosophy
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3E2914] mt-1">
             Why Choose Dr Ria&apos;s?
           </h2>
           <p className="mt-2 text-sm text-[#6B6B6B]">
-            Clean cosmetic science rooted in authentic botanical integrity.
+            Personal care rooted in authentic botanical integrity and total transparency.
           </p>
         </div>
 

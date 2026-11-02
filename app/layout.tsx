@@ -23,10 +23,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://drrias.in'),
   title: {
-    default: "Dr Ria's — Dermatologist-Designed Skincare & Haircare",
+    default: "Dr Ria's — Skincare & Haircare, Made with Care in India",
     template: "%s | Dr Ria's",
   },
-  description: "Dermatologist-designed skincare and haircare crafted with pure botanical extracts and clinical actives. Shop clinical lip balm, face wash, hair oil, moisturizer and SPF-50 sunscreen.",
+  description:
+    "Dr Ria's skincare and haircare crafted with botanical extracts and targeted ingredients. Explore lip balm, face wash, hair oil, moisturizer and SPF-50 sunscreen.",
   authors: [
     { name: 'Sachin Kashyap', url: 'https://drrias.in/about' },
     { name: 'Pratyaksh Kalsi', url: 'https://drrias.in/about' },
@@ -41,12 +42,12 @@ export const metadata: Metadata = {
     'hydroboost moisturizer',
     'vita c face wash',
     'anti pigmentation lip balm',
-    'clinical skincare',
-    'paraben free',
+    'botanical skincare',
   ],
   openGraph: {
-    title: "Dr Ria's — Dermatologist-Designed Skincare & Haircare",
-    description: "Pure botanical actives and clinically-backed formulas crafted for Indian skin and hair. Made safe and certified.",
+    title: "Dr Ria's — Skincare & Haircare, Made with Care in India",
+    description:
+      'Botanical extracts and thoughtful formulas crafted with care in India. Transparent ingredients on every label.',
     url: 'https://drrias.in',
     siteName: "Dr Ria's",
     locale: 'en_IN',
@@ -56,14 +57,15 @@ export const metadata: Metadata = {
         url: '/images/hydroboost-moisturizer-lifestyle-1200.webp',
         width: 1200,
         height: 1200,
-        alt: "Dr Ria's Clinical Skincare Collection",
+        alt: "Dr Ria's Skincare Collection",
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Dr Ria's — Dermatologist-Designed Skincare & Haircare",
-    description: "Pure botanical actives and clinically-backed formulas crafted for Indian skin and hair.",
+    title: "Dr Ria's — Skincare & Haircare, Made with Care in India",
+    description:
+      'Botanical extracts and thoughtful formulas crafted with care in India.',
     images: ['/images/hydroboost-moisturizer-lifestyle-1200.webp'],
   },
   robots: {
@@ -89,8 +91,9 @@ export default function RootLayout({
     '@type': 'Organization',
     name: "Dr Ria's",
     url: 'https://drrias.in',
-    logo: 'https://drrias.in/images/hydroboost-moisturizer-benefits-768.webp',
-    description: 'Dermatologist-designed skincare and haircare formulated with pure botanical extracts and clinical actives.',
+    logo: 'https://drrias.in/images/hydroboost-moisturizer-lifestyle-768.webp',
+    description:
+      'Skincare and haircare formulated with botanical extracts and targeted ingredients, made with care in India.',
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: '+91-9469088317',
@@ -115,10 +118,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#FBF6EE] text-[#1A1A1A] font-sans antialiased selection:bg-[#C9952A]/20 selection:text-[#5C3D1E]">
+      <body className="min-h-screen flex flex-col font-sans bg-[#FBF6EE] text-[#1A1A1A] antialiased">
         <SkipToContent />
         <Header />
-        <main id="main-content" className="flex-1">
+        <main id="main-content" className="flex-1 focus:outline-none">
           {children}
         </main>
         <Footer />

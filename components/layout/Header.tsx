@@ -9,7 +9,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const pathname = usePathname();
-  
+
   const openCart = useCartStore((state) => state.openCart);
   const items = useCartStore((state) => state.items);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -35,7 +35,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 w-full bg-[#FBF6EE]/95 backdrop-blur-md border-b border-[#E8E0D5] transition-all">
       {/* Top Notification Bar */}
       <div className="bg-[#5C3D1E] text-[#FBF6EE] px-4 py-1.5 text-xs text-center font-medium tracking-wide">
-        <span>Free Shipping on Prepaid Orders Across India &nbsp;|&nbsp; Certified Clinical Formulations</span>
+        <span>Pure Ingredients &bull; Transparent Formulas &bull; Customer Care: +91-9469088317</span>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,7 +68,7 @@ export default function Header() {
                 Dr Ria&apos;s
               </span>
               <span className="block text-[10px] sm:text-xs font-sans tracking-[0.2em] uppercase text-[#7A532B] font-medium">
-                Pure &bull; Clinical &bull; Trusted
+                Pure &bull; Honest &bull; Transparent
               </span>
             </Link>
           </div>
@@ -130,13 +130,16 @@ export default function Header() {
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
-              <span
-                aria-live="polite"
-                aria-atomic="true"
-                className="absolute top-1 right-1 flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full text-[11px] font-bold bg-[#C9952A] text-white shadow-sm"
-              >
-                {hydrated ? itemCount : 0}
-              </span>
+              {/* Hide cart badge when count is 0 */}
+              {hydrated && itemCount > 0 && (
+                <span
+                  aria-live="polite"
+                  aria-atomic="true"
+                  className="absolute top-1 right-1 flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full text-[11px] font-bold bg-[#C9952A] text-white shadow-sm"
+                >
+                  {itemCount}
+                </span>
+              )}
             </button>
           </div>
         </div>

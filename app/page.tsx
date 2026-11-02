@@ -16,7 +16,7 @@ export default function Home() {
       <HeroSection />
       <TrustStrip />
 
-      {/* Bestseller Grid */}
+      {/* Featured Collection Grid */}
       <section className="py-16 sm:py-20 bg-[#FBF6EE]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
@@ -25,10 +25,10 @@ export default function Home() {
                 The Full Collection
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3E2914] mt-1">
-                Clinical Formulations
+                Targeted Formulations
               </h2>
               <p className="mt-1 text-sm text-[#6B6B6B]">
-                Engineered with active percentages, certified manufacturing, and transparent ingredient profiles.
+                Thoughtfully formulated with purposeful botanicals and transparent ingredient profiles on every label.
               </p>
             </div>
             <Link
@@ -43,8 +43,12 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {allProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {allProducts.map((product, index) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                eager={index < 3}
+              />
             ))}
           </div>
         </div>

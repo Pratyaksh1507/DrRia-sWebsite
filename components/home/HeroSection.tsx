@@ -10,15 +10,15 @@ export default function HeroSection() {
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF3F8] text-[#244E6E] text-xs font-semibold tracking-wide border border-[#C5DCEB]">
               <span className="w-2 h-2 rounded-full bg-[#244E6E] animate-pulse" />
-              <span>Dermatologist-Formulated Care</span>
+              <span>Made in India</span>
             </div>
 
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#3E2914] leading-[1.15]">
-              Dermatologist-Designed Skincare You Can Trust
+              Skincare &amp; haircare, made with care in India
             </h1>
 
             <p className="max-w-2xl mx-auto lg:mx-0 text-base sm:text-lg text-[#5C3D1E]/90 leading-relaxed font-normal">
-              Pure botanical actives, clinical results, and targeted nourishment crafted specifically for Indian climate and skin types.
+              Thoughtfully formulated with natural actives and verified ingredients for daily care.
             </p>
 
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
@@ -42,19 +42,19 @@ export default function HeroSection() {
                 <svg className="w-4 h-4 text-[#3A7D44]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>GMP &amp; ISO 9001 Certified</span>
+                <span>Made in India</span>
               </div>
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-[#3A7D44]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Paraben-Free Actives</span>
+                <span>Ingredient lists on every product</span>
               </div>
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-[#3A7D44]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Pan-India Delivery</span>
+                <span>Patch-test guidance</span>
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@ export default function HeroSection() {
             <div className="relative mx-auto max-w-md lg:max-w-none aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white/80 bg-white">
               <Image
                 src="/images/hydroboost-moisturizer-lifestyle-768.webp"
-                alt="Dr Ria's Hydroboost Face Moisturizer clinical luxury editorial showcase"
+                alt="Dr Ria's Hydroboost Face Moisturizer editorial showcase"
                 fill
                 priority={true}
                 fetchPriority="high"
@@ -77,10 +77,10 @@ export default function HeroSection() {
             {/* Soft decorative badge */}
             <div className="absolute -bottom-4 -left-4 sm:bottom-4 sm:-left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-[#E8E0D5] max-w-[200px]">
               <span className="block text-[11px] font-bold uppercase tracking-wider text-[#7A532B]">
-                100% Pure Actives
+                Thoughtfully Crafted
               </span>
               <span className="block text-xs font-medium text-[#1A1A1A] mt-0.5">
-                Gentle on skin, uncompromising on results.
+                Gentle on skin, purposeful daily care.
               </span>
             </div>
           </div>

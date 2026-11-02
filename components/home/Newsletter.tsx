@@ -21,10 +21,10 @@ export default function Newsletter() {
           Join the Circle
         </span>
         <h2 className="font-serif text-3xl font-bold">
-          Dermatology Insights &amp; Exclusive Drops
+          Skincare Insights &amp; Product Updates
         </h2>
         <p className="text-xs sm:text-sm text-[#E8E0D5]/80 max-w-lg mx-auto">
-          Subscribe for early access to limited seasonal batches, skincare routines, and exclusive member discounts.
+          Subscribe for product launches, seasonal care tips, and brand updates.
         </p>
 
         {subscribed ? (

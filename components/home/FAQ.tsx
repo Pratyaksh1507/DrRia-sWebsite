@@ -8,23 +8,23 @@ export default function FAQ() {
   const faqs = [
     {
       q: "Are Dr Ria's products safe for sensitive skin?",
-      a: "Yes. Our formulations prioritize skin barrier integrity with gentle botanical butters and dermatologist-approved actives. However, because natural extracts can cause individual sensitivities, we always recommend doing a 24-hour patch test before first use.",
+      a: 'Our formulations combine gentle botanical butters and purposeful actives. However, because natural extracts can cause individual sensitivities, we always recommend doing a 24-hour patch test on the inner forearm before first use.',
     },
     {
-      q: 'Are the products paraben free?',
-      a: 'Yes, all Dr Ria’s products are 100% paraben free and formulated without harmful toxins or aggressive fillers.',
+      q: 'How should I store these products?',
+      a: 'Store all bottles and jars in a cool, dry place away from direct sunlight and heat. Keep containers tightly closed when not in use.',
     },
     {
       q: "Where are Dr Ria's products manufactured?",
-      a: 'Our products are manufactured in audited, GMP-certified and ISO 9001 certified pharmaceutical-grade cosmetic facilities in India (including Ambient Bio Care in Delhi, Vancom Solutions in Gurgaon, and Trassally International in Noida) under strict quality protocols.',
+      a: 'Our products are manufactured in licensed cosmetic facilities in India, including Ambient Bio Care in Delhi, Vancom Solutions in Gurgaon, and Trassally International in Noida, with complete manufacturing licenses displayed on each product label.',
     },
     {
-      q: 'How long does delivery take?',
-      a: 'Prepaid and Cash on Delivery orders are dispatched within 24 to 48 hours. Typical courier transit time is 3 to 5 business days across India.',
+      q: 'How long does dispatch take?',
+      a: 'Orders are processed and dispatched within 24 to 48 business hours. You will receive tracking details via SMS/WhatsApp once your parcel is on its way.',
     },
     {
       q: 'What is your return policy?',
-      a: 'Due to personal hygiene and cosmetic safety standards, opened or used bottles cannot be returned. If you receive a damaged or incorrect package, please contact us within 48 hours with unboxing photos for a prompt replacement.',
+      a: 'Due to personal hygiene and safety standards for cosmetic products, opened or used items cannot be returned. If you receive a damaged or incorrect package, please contact us within 48 hours with unboxing photos for a prompt replacement.',
     },
   ];
 

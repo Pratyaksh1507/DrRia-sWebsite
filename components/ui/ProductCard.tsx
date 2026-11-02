@@ -8,11 +8,18 @@ import { useCartStore } from '@/lib/cart';
 interface ProductCardProps {
   product: Product;
   priority?: boolean;
+  eager?: boolean;
 }
 
-export default function ProductCard({ product, priority = false }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  priority = false,
+  eager = false,
+}: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
-  const heroImg = product.images[product.heroImageIndex] || product.images[0];
+  // Always use the clean lifestyle/packshot image (images[0]) for cards
+  const cardImg = product.images[0];
+  const isEager = priority || eager;
 
   return (
     <article className="group relative flex flex-col bg-white rounded-2xl border border-[#E8E0D5] overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300">
@@ -23,14 +30,13 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
         aria-label={`View details for ${product.name}`}
       >
         <Image
-          src={heroImg.src}
-          alt={heroImg.alt}
+          src={cardImg.src}
+          alt={cardImg.alt}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          priority={priority}
-          loading={priority ? undefined : 'lazy'}
-          placeholder={heroImg.blurDataURL ? 'blur' : 'empty'}
-          blurDataURL={heroImg.blurDataURL}
+          loading={isEager ? 'eager' : 'lazy'}
+          placeholder={cardImg.blurDataURL ? 'blur' : 'empty'}
+          blurDataURL={cardImg.blurDataURL}
           className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
         />
         {/* Category Accent Badge */}
@@ -48,7 +54,11 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
         <div>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-medium text-[#6B6B6B]">{product.size}</span>
+            {product.size ? (
+              <span className="text-xs font-medium text-[#6B6B6B]">{product.size}</span>
+            ) : (
+              <span className="text-xs font-medium text-[#6B6B6B]">&nbsp;</span>
+            )}
             {product.badges && product.badges[0] && (
               <span className="text-[10px] text-[#3A7D44] bg-[#EDF6EE] px-2 py-0.5 rounded font-medium">
                 {product.badges[0]}

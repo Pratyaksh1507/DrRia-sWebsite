@@ -1,6 +1,6 @@
 # Dr Ria's — Premium Skincare & Haircare E-Commerce Storefront
 
-A production-ready, high-performance e-commerce platform built for **Dr Ria's**, featuring clinical formulations, botanical actives, and mobile-first commerce for Indian consumers.
+A production-ready, high-performance e-commerce platform built for **Dr Ria's**, featuring targeted formulations, botanical actives, and mobile-first commerce for Indian consumers.
 
 Designed and developed to achieve **95+ across all Google Lighthouse metrics** on mobile.
 
@@ -26,7 +26,7 @@ Designed and developed to achieve **95+ across all Google Lighthouse metrics** o
 * **Rendering Strategy**: 100% Static Site Generation (SSG) via `generateStaticParams` for instant page loads and zero server latency
 * **State Management**: Persistent client-side cart powered by Zustand and `localStorage` with `aria-live="polite"` screen reader announcements
 * **Image Optimization Pipeline**: Custom Sharp build script generating responsive **WebP** and **AVIF** assets at 480px, 768px, and 1200px breakpoints with base64 blur placeholders
-* **Typography**: Self-hosted Google Fonts (`Playfair Display` serif for clinical luxury titles and `Inter` sans for high-readability body copy) using `font-display: swap`
+* **Typography**: Self-hosted Google Fonts (`Playfair Display` serif for titles and `Inter` sans for high-readability body copy) using `font-display: swap`
 * **Payment Integration**: Razorpay checkout (UPI, cards, netbanking) loaded strictly on-demand on user click, plus instant WhatsApp order fallback
 
 ---
@@ -139,7 +139,7 @@ vercel --prod
 | **`accessibility`** | Addy Osmani / Chrome | • Tuned contrast ratios across all badges and labels to exceed WCAG AA 4.5:1 minimums.<br>• Added [`SkipToContent.tsx`](file:///Users/pratyakshkalsi/Desktop/drria/components/layout/SkipToContent.tsx) landmark navigation.<br>• Keyboard focus rings and ARIA accessibility tree landmarks across navigation and accordions. |
 | **`storefront-best-practices`** | Medusa | • Configured `aria-live="polite"` on cart counter updates for screen readers.<br>• Added `env(safe-area-inset-bottom)` to sticky mobile purchase bars to prevent iPhone home-indicator clipping.<br>• Rendered product prices and stock availability in server HTML for AI shopping agents. |
 | **`seo`** | Addy Osmani / Chrome | • Schema.org `Product`, `Offer`, `Brand`, and `Organization` JSON-LD structured data.<br>• Canonical link tags, Open Graph cards, dynamic [`sitemap.ts`](file:///Users/pratyakshkalsi/Desktop/drria/app/sitemap.ts), and [`robots.ts`](file:///Users/pratyakshkalsi/Desktop/drria/app/robots.ts). |
-| **`web-design-guidelines`** | Vercel Labs | • Clinical-luxury aesthetic (#FBF6EE warm cream, #5C3D1E deep brown, #C9952A gold).<br>• 44px minimum touch targets on mobile for touch ease. |
+| **`web-design-guidelines`** | Vercel Labs | • Warm premium aesthetic (#FBF6EE warm cream, #5C3D1E deep brown, #C9952A gold).<br>• 44px minimum touch targets on mobile for touch ease. |
 
 ---
 
@@ -156,3 +156,4 @@ vercel --prod
 ## 👥 Credits
 * **Product Design & Marketing**: Sachin Kashyap
 * **Website Design & Development**: Pratyaksh Kalsi
+

@@ -72,7 +72,7 @@ export default function CartDrawer() {
                   <div className="flex-1 min-w-0 flex flex-col justify-between">
                     <div>
                       <h3 className="text-sm font-medium text-[#1A1A1A] truncate">{product.name}</h3>
-                      <p className="text-xs text-[#6B6B6B]">{product.size}</p>
+                      {product.size && <p className="text-xs text-[#6B6B6B]">{product.size}</p>}
                     </div>
                     <div className="flex items-center justify-between pt-2">
                       <div className="flex items-center border border-[#E8E0D5] rounded-lg bg-[#FDFBF7]">
@@ -133,7 +133,7 @@ export default function CartDrawer() {
                 <a
                   href={`https://wa.me/919469088317?text=${encodeURIComponent(
                     `Hello Dr Ria's! I'd like to place an order for:\n` +
-                      items.map((i) => `• ${i.product.name} (${i.product.size}) x${i.quantity} = ₹${i.product.price * i.quantity}`).join('\n') +
+                      items.map((i) => `• ${i.product.name}${i.product.size ? ` (${i.product.size})` : ''} x${i.quantity} = ₹${i.product.price * i.quantity}`).join('\n') +
                       `\nTotal: ₹${cartTotal}`
                   )}`}
                   target="_blank"

@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'About Dr Ria’s | Clinical Luxury Formulation',
+  title: 'About Dr Ria’s | Thoughtful Skincare & Haircare',
   description:
-    'Learn about the formulation philosophy, clinical standards, and leadership behind Dr Ria’s skincare and haircare.',
+    'Learn about the philosophy, standards, and leadership behind Dr Ria’s skincare and haircare.',
 };
 
 export default function AboutPage() {
@@ -17,10 +17,10 @@ export default function AboutPage() {
             Our Story &amp; Standards
           </span>
           <h1 className="font-serif text-3xl sm:text-5xl font-bold text-[#3E2914]">
-            Dermatologist-Designed. Botanical Integrity.
+            Thoughtfully Formulated. Botanical Integrity.
           </h1>
           <p className="text-sm sm:text-base text-[#6B6B6B] max-w-2xl mx-auto leading-relaxed">
-            Formulating clean, clinically verifiable cosmetics specifically designed to protect, restore, and celebrate Indian skin and hair.
+            Formulating clean, thoughtful cosmetics designed to nourish, protect, and celebrate Indian skin and hair.
           </p>
         </div>
 
@@ -30,25 +30,25 @@ export default function AboutPage() {
             The Genesis of Dr Ria&apos;s
           </h2>
           <p>
-            [EDIT: Dr Ria founded this brand to bridge the divide between harsh clinical prescriptions and gentle Ayurvedic botanicals.] 
-            Recognizing that Indian skin faces distinct climatic challenges—prolonged UV exposure, urban pollution, and varying humidity across seasons—Dr Ria’s sets out to engineer everyday essentials that strengthen rather than strip the moisture barrier.
+            Dr Ria&apos;s was founded to provide transparent, thoughtful personal care made with care in India. 
+            Recognizing that Indian skin faces distinct climatic challenges—prolonged UV exposure, urban pollution, and varying humidity across seasons—Dr Ria’s sets out to engineer everyday essentials that nourish and protect.
           </p>
           <p>
-            From our multi-active <strong>Hair Growth Oil</strong> containing 14 pure botanical extracts to our high-defence <strong>SPF-50 PA+++ Sunscreen</strong> and moisture-binding <strong>Hydroboost Moisturizer</strong>, every bottle reflects rigorous ingredient purity and transparent labeling.
+            From our <strong>Hair Growth Oil</strong> crafted with natural actives that nourish the scalp and strengthen roots to our high-defence <strong>SPF-50 PA+++ Sunscreen</strong> and moisture-binding <strong>Hydroboost Moisturizer</strong>, every bottle reflects transparent labeling and purposeful ingredients.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-[#F3EBDD]">
             <div className="p-4 rounded-xl bg-[#FDFBF7] border border-[#E8E0D5]">
-              <span className="block font-serif text-xl font-bold text-[#5C3D1E]">100%</span>
-              <span className="text-xs text-[#6B6B6B]">Paraben-Free &amp; Toxin-Free</span>
+              <span className="block font-serif text-xl font-bold text-[#5C3D1E]">Made in India</span>
+              <span className="text-xs text-[#6B6B6B]">Formulated &amp; produced locally</span>
             </div>
             <div className="p-4 rounded-xl bg-[#FDFBF7] border border-[#E8E0D5]">
-              <span className="block font-serif text-xl font-bold text-[#5C3D1E]">GMP</span>
-              <span className="text-xs text-[#6B6B6B]">Certified Medical-Grade Labs</span>
+              <span className="block font-serif text-xl font-bold text-[#5C3D1E]">Transparent</span>
+              <span className="text-xs text-[#6B6B6B]">Full ingredient lists on every label</span>
             </div>
             <div className="p-4 rounded-xl bg-[#FDFBF7] border border-[#E8E0D5]">
-              <span className="block font-serif text-xl font-bold text-[#5C3D1E]">ISO 9001</span>
-              <span className="text-xs text-[#6B6B6B]">Quality Management Audited</span>
+              <span className="block font-serif text-xl font-bold text-[#5C3D1E]">Care</span>
+              <span className="text-xs text-[#6B6B6B]">Patch-test guidance recommended</span>
             </div>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function AboutPage() {
                 Product design &amp; marketed by Sachin Kashyap
               </p>
               <p className="text-xs text-[#6B6B6B] leading-relaxed">
-                Spearheading product formulation aesthetics, packaging design, ingredient curation, and market distribution across India to ensure clinical luxury is accessible.
+                Spearheading product formulation aesthetics, packaging design, ingredient curation, and market distribution across India to ensure quality personal care is accessible.
               </p>
             </div>
 

@@ -6,11 +6,11 @@ import ShopClient from './ShopClient';
 export const metadata: Metadata = {
   title: 'Shop All Formulations',
   description:
-    'Explore the full range of dermatologist-designed skincare, haircare, and sun protection formulations by Dr Ria’s.',
+    'Explore the full range of skincare, haircare, and sun protection formulations by Dr Ria’s.',
   openGraph: {
     title: "Shop All Formulations | Dr Ria's",
     description:
-      'Pure active ingredients, clinical results, and transparent cosmetic formulations.',
+      'Targeted active ingredients, honest formulations, and transparent cosmetic details.',
   },
 };
 
@@ -29,7 +29,7 @@ export default function ShopPage() {
             Shop All Formulations
           </h1>
           <p className="mt-2 text-sm text-[#6B6B6B]">
-            Certified clinical solutions for hair strengthening, moisture restoration, daily brightening, and UVA/UVB defence.
+            Formulated for hair strengthening, moisture restoration, daily brightening, and UVA/UVB defence.
           </p>
         </div>
 

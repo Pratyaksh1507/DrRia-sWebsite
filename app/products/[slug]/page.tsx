@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const primaryImg = product.images[0]?.src || '/images/hydroboost-moisturizer-lifestyle-768.webp';
 
   return {
-    title: `${product.name} (${product.size})`,
+    title: product.size ? `${product.name} (${product.size})` : product.name,
     description: `${product.tagline}. ${product.description}`,
     openGraph: {
       title: `${product.name} | Dr Ria's`,
@@ -104,9 +104,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   >
                     {product.categoryLabel}
                   </span>
-                  <span className="text-xs font-medium text-[#6B6B6B]">
-                    Volume: {product.size}
-                  </span>
+                  {product.size && (
+                    <span className="text-xs font-medium text-[#6B6B6B]">
+                      Volume: {product.size}
+                    </span>
+                  )}
                 </div>
 
                 <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-[#1A1A1A] leading-tight">

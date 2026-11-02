@@ -11,17 +11,14 @@ export default function Footer() {
               Dr Ria&apos;s
             </h2>
             <p className="text-xs sm:text-sm text-[#E8E0D5]/80 leading-relaxed">
-              Dermatologist-designed skincare and haircare formulated with pure botanical extracts and clinical actives, crafted specifically for Indian climate and skin types.
+              Skincare and haircare formulated with pure botanical extracts and targeted ingredients, crafted with care in India.
             </p>
             <div className="pt-2 flex flex-wrap gap-2 text-xs">
               <span className="inline-block px-2.5 py-1 rounded bg-[#5C3D1E] text-[#FBF6EE] font-medium border border-[#7A532B]">
-                GMP Certified
+                Made in India
               </span>
               <span className="inline-block px-2.5 py-1 rounded bg-[#5C3D1E] text-[#FBF6EE] font-medium border border-[#7A532B]">
-                ISO 9001
-              </span>
-              <span className="inline-block px-2.5 py-1 rounded bg-[#5C3D1E] text-[#FBF6EE] font-medium border border-[#7A532B]">
-                Paraben Free
+                Transparent Ingredients
               </span>
             </div>
           </div>
@@ -68,17 +65,17 @@ export default function Footer() {
           {/* Customer Care & Policies */}
           <div>
             <h3 className="text-sm font-semibold tracking-wider uppercase text-[#C9952A] mb-4">
-              Legal & Support
+              Legal &amp; Support
             </h3>
             <ul className="space-y-2.5 text-sm text-[#E8E0D5]/80">
               <li>
                 <Link href="/policies/shipping" className="hover:text-[#C9952A] transition-colors">
-                  Shipping & Delivery
+                  Shipping &amp; Delivery
                 </Link>
               </li>
               <li>
                 <Link href="/policies/returns" className="hover:text-[#C9952A] transition-colors">
-                  Returns & Refunds
+                  Returns &amp; Refunds
                 </Link>
               </li>
               <li>
@@ -138,12 +135,12 @@ export default function Footer() {
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
             <span>&copy; 2026 Dr Ria&apos;s. All rights reserved.</span>
             <span className="hidden sm:inline">&bull;</span>
-            <span className="text-[#C9952A] font-medium">Product design & marketed by Sachin Kashyap</span>
+            <span className="text-[#C9952A] font-medium">Product design &amp; marketed by Sachin Kashyap</span>
             <span className="hidden sm:inline">&bull;</span>
-            <span className="text-[#C9952A] font-medium">Website designed & developed by Pratyaksh Kalsi</span>
+            <span className="text-[#C9952A] font-medium">Website designed &amp; developed by Pratyaksh Kalsi</span>
           </div>
           <div className="text-center md:text-right text-[11px] text-[#E8E0D5]/60">
-            <span>Clinical-Luxury Formulation &bull; Made in India</span>
+            <span>Skincare &amp; Haircare &bull; Made in India</span>
           </div>
         </div>
       </div>

@@ -23,8 +23,9 @@ export default function ProductActions({ product }: ProductActionsProps) {
     router.push('/checkout');
   };
 
+  const sizeLabel = product.size ? ` (${product.size})` : '';
   const whatsAppText = encodeURIComponent(
-    `Hello Dr Ria's! I would like to order: ${product.name} (${product.size}) x ${quantity} = ₹${(
+    `Hello Dr Ria's! I would like to order: ${product.name}${sizeLabel} x ${quantity} = ₹${(
       product.price * quantity
     ).toLocaleString('en-IN')}.\nPlease confirm availability.`
   );

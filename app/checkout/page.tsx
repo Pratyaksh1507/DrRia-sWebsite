@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { STORE_CONFIG } from '@/lib/config';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCartStore } from '@/lib/cart';
@@ -432,7 +433,11 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between text-[#6B6B6B]">
                 <span>Shipping</span>
-                <span className="text-[#3A7D44] font-medium">Free (Pan-India)</span>
+                {STORE_CONFIG.ENABLE_FREE_SHIPPING_PROMO ? (
+                  <span className="text-[#3A7D44] font-medium">Free (Pan-India)</span>
+                ) : (
+                  <span className="text-[#3A7D44] font-medium">Included</span>
+                )}
               </div>
               <div className="flex justify-between text-base font-bold text-[#1A1A1A] pt-3 border-t border-[#F3EBDD]">
                 <span>Total Due</span>
@@ -441,8 +446,8 @@ export default function CheckoutPage() {
             </div>
 
             <div className="p-3 rounded-xl bg-[#FDFBF7] border border-[#E8E0D5] text-[11px] text-[#6B6B6B] space-y-1">
-              <p className="font-semibold text-[#5C3D1E]">100% Genuine Clinical Guarantee</p>
-              <p>Every bottle is sealed and sourced directly from certified labs.</p>
+              <p className="font-semibold text-[#5C3D1E]">100% Authentic Product Guarantee</p>
+              <p>Every bottle is sealed and shipped directly from certified facilities.</p>
             </div>
           </div>
         </div>
