@@ -7,6 +7,7 @@ export default function CategoryTiles() {
       subtitle: 'Gentle Cleansing & Moisture',
       href: '/shop?category=skin',
       accent: '#E8651A',
+      textColor: '#9C3400',
       bgColor: '#FDF1EA',
     },
     {
@@ -14,6 +15,7 @@ export default function CategoryTiles() {
       subtitle: '14 Pure Actives for Root Health',
       href: '/shop?category=hair',
       accent: '#C9952A',
+      textColor: '#7A532B',
       bgColor: '#FAF5EA',
     },
     {
@@ -21,6 +23,7 @@ export default function CategoryTiles() {
       subtitle: 'Deep Moisture & Protection',
       href: '/shop?category=lips',
       accent: '#4A7FA5',
+      textColor: '#244E6E',
       bgColor: '#EBF3F8',
     },
     {
@@ -28,6 +31,7 @@ export default function CategoryTiles() {
       subtitle: 'Broad Spectrum SPF-50 PA+++',
       href: '/shop?category=sun',
       accent: '#3A7D44',
+      textColor: '#245C2D',
       bgColor: '#EDF6EE',
     },
   ];
@@ -53,7 +57,7 @@ export default function CategoryTiles() {
               style={{ borderTop: `4px solid ${cat.accent}` }}
             >
               <div>
-                <span className="text-xs uppercase tracking-wider font-semibold" style={{ color: cat.accent }}>
+                <span className="text-xs uppercase tracking-wider font-bold" style={{ color: cat.textColor }}>
                   Collection
                 </span>
                 <h3 className="font-serif text-xl font-bold text-[#1A1A1A] mt-1 group-hover:text-[#5C3D1E] transition-colors">

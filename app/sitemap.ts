@@ -4,10 +4,11 @@ import { getAllProducts } from '@/data/products';
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://drrias.in';
   const products = getAllProducts();
+  const buildDate = '2026-11-02';
 
   const productEntries: MetadataRoute.Sitemap = products.map((product) => ({
     url: `${baseUrl}/products/${product.slug}`,
-    lastModified: new Date(),
+    lastModified: buildDate,
     changeFrequency: 'weekly',
     priority: 0.9,
   }));
@@ -15,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const policyEntries: MetadataRoute.Sitemap = ['shipping', 'returns', 'privacy', 'terms'].map(
     (policy) => ({
       url: `${baseUrl}/policies/${policy}`,
-      lastModified: new Date(),
+      lastModified: buildDate,
       changeFrequency: 'monthly',
       priority: 0.4,
     })
@@ -24,25 +25,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: buildDate,
       changeFrequency: 'daily',
       priority: 1.0,
     },
     {
       url: `${baseUrl}/shop`,
-      lastModified: new Date(),
+      lastModified: buildDate,
       changeFrequency: 'daily',
       priority: 0.95,
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: new Date(),
+      lastModified: buildDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/contact`,
-      lastModified: new Date(),
+      lastModified: buildDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },

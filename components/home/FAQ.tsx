@@ -32,7 +32,7 @@ export default function FAQ() {
     <section className="py-16 bg-[#FBF6EE]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-10">
-          <span className="text-xs font-semibold tracking-widest uppercase text-[#C9952A]">
+          <span className="text-xs font-bold tracking-widest uppercase text-[#7A532B]">
             Questions &amp; Answers
           </span>
           <h2 className="font-serif text-3xl font-bold text-[#3E2914] mt-1">

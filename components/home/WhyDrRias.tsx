@@ -24,7 +24,7 @@ export default function WhyDrRias() {
     <section className="py-16 bg-white border-y border-[#E8E0D5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-semibold tracking-widest uppercase text-[#C9952A]">
+          <span className="text-xs font-bold tracking-widest uppercase text-[#7A532B]">
             The Clinical Luxury Standard
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3E2914] mt-1">

@@ -8,8 +8,8 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Text Content */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF3F8] text-[#4A7FA5] text-xs font-semibold tracking-wide border border-[#C5DCEB]">
-              <span className="w-2 h-2 rounded-full bg-[#4A7FA5] animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF3F8] text-[#244E6E] text-xs font-semibold tracking-wide border border-[#C5DCEB]">
+              <span className="w-2 h-2 rounded-full bg-[#244E6E] animate-pulse" />
               <span>Dermatologist-Formulated Care</span>
             </div>
 
@@ -76,7 +76,7 @@ export default function HeroSection() {
             </div>
             {/* Soft decorative badge */}
             <div className="absolute -bottom-4 -left-4 sm:bottom-4 sm:-left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-[#E8E0D5] max-w-[200px]">
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-[#C9952A]">
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-[#7A532B]">
                 100% Pure Actives
               </span>
               <span className="block text-xs font-medium text-[#1A1A1A] mt-0.5">

@@ -21,7 +21,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
             <div>
-              <span className="text-xs font-semibold tracking-widest uppercase text-[#C9952A]">
+              <span className="text-xs font-bold tracking-widest uppercase text-[#7A532B]">
                 The Full Collection
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3E2914] mt-1">

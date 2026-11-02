@@ -136,7 +136,7 @@ export default function Footer() {
         {/* Mandatory Credits and Copyright */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-[#E8E0D5]/70 gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
-            <span>&copy; {new Date().getFullYear()} Dr Ria&apos;s. All rights reserved.</span>
+            <span>&copy; 2026 Dr Ria&apos;s. All rights reserved.</span>
             <span className="hidden sm:inline">&bull;</span>
             <span className="text-[#C9952A] font-medium">Product design & marketed by Sachin Kashyap</span>
             <span className="hidden sm:inline">&bull;</span>
