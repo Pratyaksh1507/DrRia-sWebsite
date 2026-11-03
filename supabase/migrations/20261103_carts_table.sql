@@ -46,3 +46,4 @@ create trigger handle_cart_updated_at
   before update on public.carts
   for each row
   execute function public.handle_updated_at();
+

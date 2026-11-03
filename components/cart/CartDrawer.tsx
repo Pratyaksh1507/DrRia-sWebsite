@@ -112,7 +112,7 @@ export default function CartDrawer() {
                 <div key={product.slug} className="flex gap-4 p-3 bg-white rounded-xl border border-[#E8E0D5] shadow-xs">
                   <div className="relative w-20 h-20 shrink-0 bg-[#FDFBF7] rounded-lg overflow-hidden border border-[#E8E0D5]">
                     <Image
-                      src={product.images[0]?.src || '/images/lip-balm-spa-480.webp'}
+                      src={product.images[0]?.src || '/images/lip-balm-jar-480.webp'}
                       alt={product.images[0]?.alt || product.name}
                       fill
                       sizes="80px"

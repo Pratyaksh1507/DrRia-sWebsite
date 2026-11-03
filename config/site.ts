@@ -35,3 +35,4 @@ export const SITE_CONFIG = {
     development: 'Pratyaksh Kalsi',
   },
 } as const;
+

@@ -77,16 +77,16 @@ export const products: Product[] = [
     inStock: true,
     images: [
       {
-        src: '/images/lip-balm-spa-768.webp',
+        src: '/images/lip-balm-jar-768.webp',
         webpSrcSet:
-          '/images/lip-balm-spa-480.webp 480w, /images/lip-balm-spa-768.webp 768w, /images/lip-balm-spa-1200.webp 1200w',
+          '/images/lip-balm-jar-480.webp 480w, /images/lip-balm-jar-768.webp 768w, /images/lip-balm-jar-1200.webp 1200w',
         avifSrcSet:
-          '/images/lip-balm-spa-480.avif 480w, /images/lip-balm-spa-768.avif 768w, /images/lip-balm-spa-1200.avif 1200w',
-        alt: "Dr Ria's Anti-Pigmentation Lip Balm spa editorial shot with delicate rose petals and serene luxury background",
+          '/images/lip-balm-jar-480.avif 480w, /images/lip-balm-jar-768.avif 768w, /images/lip-balm-jar-1200.avif 1200w',
+        alt: "Dr Ria's Anti Pigmentation Lip Balm jar",
         width: 768,
         height: 768,
         blurDataURL:
-          'data:image/webp;base64,UklGRswAAABXRUJQVlA4IMAAAADwBACdASoUABQAPtFgqU+oJSOiKAgBABoJQBOmbIApRLe25Cd0HNiGf4Q5/tYWFbAA/pnxnYzZAQQj5oonZ3FiXZt73SUIY2Rpmxv55HG+KkqU7Rpg4641hLVwnbY+NffkQbqfsqwHuM6YxXep793qd3UE49mXpTwinz7gI5icTmZsHc2DQj1bh59WxKxPbmjOy1q4prMdOayRmmk8M4qzCqYVcyLenbd34ts+gqpUYorbQRDdGYAy3rSAlplMAAA=',
+          'data:image/webp;base64,UklGRrYAAABXRUJQVlA4IKoAAADQBACdASoUABQAPtFgqU+oJSOiKAgBABoJYwCo9AfbyQYmIxpjiiOmS44RdbOkwAD+mfGdjNkBBCPmiidncWJdmRzjTMTqhRsuRZXwii34h96drfVCyYXUCccisOJtviBDuQmPnWF1hV7594gZ664nXvyEOC5SbDVQ/due2f3PThp3xvihwgOFg5WOlGWDp2+GSiBkUJmkN3fxKR/S0ETiQXHnoMEnA3+uAA==',
       },
       {
         src: '/images/lip-balm-benefits-768.webp',

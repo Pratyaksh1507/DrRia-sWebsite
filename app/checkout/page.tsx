@@ -751,7 +751,7 @@ export default function CheckoutPage() {
                 <div key={product.slug} className="flex gap-3 text-xs">
                   <div className="relative w-14 h-14 rounded-lg bg-[#FDFBF7] border border-[#E8E0D5] overflow-hidden shrink-0">
                     <Image
-                      src={product.images[0]?.src || '/images/lip-balm-spa-480.webp'}
+                      src={product.images[0]?.src || '/images/lip-balm-jar-480.webp'}
                       alt={product.name}
                       fill
                       sizes="56px"

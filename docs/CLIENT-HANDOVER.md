@@ -189,3 +189,4 @@ You will receive an instant diagnostic report:
 1. **Never commit `.env.local` to Git**: It contains real production passwords.
 2. **Never expose `SUPABASE_SERVICE_ROLE_KEY` or `RAZORPAY_KEY_SECRET`**: Keep them restricted to Vercel Server Environment Variables.
 3. **Product Prices**: Set confirmed final prices in [`data/products.ts`](file:///Users/pratyakshkalsi/Desktop/drria/data/products.ts). The server recalculates all totals directly from this file during checkout.
+

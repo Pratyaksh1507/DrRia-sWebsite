@@ -8,7 +8,7 @@ const SIZES = [480, 768, 1200];
 
 const MAP = {
   'Anti-Pigmentation Lip Balm Benefits.png': 'lip-balm-benefits',
-  'Anti-Pigmentation Lip Balm Spa Scene.png': 'lip-balm-spa',
+  'Compact Anti-Pigmentation Lip Balm Jar.png': 'lip-balm-jar',
   'Elegant Blue-Accented Cosmetic Information Label.png': 'lip-balm-label',
   'Dr Ria\'s Vita C Glow Face Wash.png': 'vita-c-face-wash-benefits',
   'Vita C Daily Glow Face Wash.png': 'vita-c-face-wash-lifestyle',

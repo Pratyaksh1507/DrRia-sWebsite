@@ -25,7 +25,7 @@ export default function CategoryTiles() {
       title: 'Lip Nourishment',
       subtitle: 'Deep Moisture & Protection',
       href: '/shop?category=lips',
-      image: '/images/lip-balm-spa-480.webp',
+      image: '/images/lip-balm-jar-480.webp',
       accent: '#4A7FA5',
       textColor: '#244E6E',
       bgColor: '#EBF3F8',
