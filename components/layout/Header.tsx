@@ -30,7 +30,7 @@ export default function Header() {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
-    useCartStore.persist.rehydrate();
+    useCartStore.getState().initializeCart();
     setHydrated(true);
   }, []);
 

@@ -82,6 +82,9 @@ export async function POST(request: Request) {
         })
         .eq('id', orderId);
 
+      // Clear saved server cart ONLY after successful payment verification
+      await adminSupabase.from('carts').delete().eq('user_id', user.id);
+
       // Trigger order confirmation email asynchronously
       if (user.email) {
         const address = order.address_snapshot || {

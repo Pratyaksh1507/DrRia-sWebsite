@@ -52,7 +52,7 @@ export default function CheckoutPage() {
   const supabase = createClient();
 
   useEffect(() => {
-    useCartStore.persist.rehydrate();
+    useCartStore.getState().initializeCart();
     setHydrated(true);
 
     async function loadUserSession() {

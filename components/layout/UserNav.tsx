@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { useCartStore } from '@/lib/cart';
 
 export default function UserNav() {
   const router = useRouter();
@@ -22,8 +23,14 @@ export default function UserNav() {
     // Subscribe to auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      const u = session?.user ?? null;
+      setUser(u);
+      if (event === 'SIGNED_IN' && u) {
+        useCartStore.getState().syncOnLogin({ id: u.id, email: u.email });
+      } else if (event === 'SIGNED_OUT') {
+        useCartStore.getState().resetOnLogout();
+      }
     });
 
     return () => {
@@ -48,6 +55,7 @@ export default function UserNav() {
 
   const handleSignOut = async () => {
     setMenuOpen(false);
+    useCartStore.getState().resetOnLogout();
     await supabase.auth.signOut();
     router.push('/');
     router.refresh();

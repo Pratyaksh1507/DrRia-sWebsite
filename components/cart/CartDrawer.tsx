@@ -5,7 +5,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function CartDrawer() {
-  const { isOpen, closeCart, items, updateQuantity, removeItem, total } = useCartStore();
+  const {
+    isOpen,
+    closeCart,
+    items,
+    updateQuantity,
+    removeItem,
+    total,
+    restoreMessage,
+    setRestoreMessage,
+    droppedNotice,
+    setDroppedNotice,
+  } = useCartStore();
 
   if (!isOpen) return null;
 
@@ -43,6 +54,45 @@ export default function CartDrawer() {
               </svg>
             </button>
           </div>
+
+          {/* Cart Restored Banner */}
+          {restoreMessage && (
+            <div
+              role="status"
+              className="px-5 py-2.5 bg-[#EDF6EE] border-b border-[#C5E5C9] text-xs font-semibold text-[#3A7D44] flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <span>✓</span>
+                <span>{restoreMessage}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRestoreMessage(null)}
+                aria-label="Dismiss message"
+                className="text-[#3A7D44] hover:text-[#2D6A4F] ml-2 text-sm font-bold"
+              >
+                &times;
+              </button>
+            </div>
+          )}
+
+          {/* Dropped Obsolete Item Notice */}
+          {droppedNotice && (
+            <div
+              role="alert"
+              className="px-5 py-2.5 bg-amber-50 border-b border-amber-200 text-xs text-amber-800 flex items-center justify-between"
+            >
+              <span>{droppedNotice}</span>
+              <button
+                type="button"
+                onClick={() => setDroppedNotice(null)}
+                aria-label="Dismiss notice"
+                className="text-amber-800 hover:text-amber-900 ml-2 text-sm font-bold"
+              >
+                &times;
+              </button>
+            </div>
+          )}
 
           {/* Items List */}
           <div className="flex-1 overflow-y-auto p-5 space-y-4">

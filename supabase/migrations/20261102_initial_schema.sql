@@ -156,3 +156,34 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+--------------------------------------------------------------------------------
+-- 5. CARTS TABLE (Server-side persisted carts for signed-in users)
+--------------------------------------------------------------------------------
+create table if not exists public.carts (
+  user_id uuid references auth.users on delete cascade primary key,
+  items jsonb not null default '[]'::jsonb,
+  updated_at timestamptz default now() not null
+);
+
+alter table public.carts enable row level security;
+
+create policy "Users can read own cart"
+  on public.carts
+  for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert own cart"
+  on public.carts
+  for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own cart"
+  on public.carts
+  for update
+  using (auth.uid() = user_id);
+
+create policy "Users can delete own cart"
+  on public.carts
+  for delete
+  using (auth.uid() = user_id);
+

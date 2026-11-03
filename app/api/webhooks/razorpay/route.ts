@@ -54,6 +54,16 @@ export async function POST(request: Request) {
           console.error('[Webhook Order Update Error]', error);
         } else {
           console.log(`[Webhook Success] Order with Razorpay ID ${razorpayOrderId} marked as paid.`);
+          // Clear server cart for the user who placed this order
+          const { data: orderData } = await adminSupabase
+            .from('orders')
+            .select('user_id')
+            .eq('razorpay_order_id', razorpayOrderId)
+            .maybeSingle();
+
+          if (orderData?.user_id) {
+            await adminSupabase.from('carts').delete().eq('user_id', orderData.user_id);
+          }
         }
       }
     }
