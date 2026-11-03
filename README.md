@@ -191,7 +191,7 @@ In the [Vercel Dashboard](https://vercel.com/):
 
 * [ ] **Supabase Setup**: Create a project on Supabase and run [`supabase/migrations/20261102_initial_schema.sql`](file:///Users/pratyakshkalsi/Desktop/drria/supabase/migrations/20261102_initial_schema.sql) in the SQL Editor.
 * [ ] **Google OAuth**: Configure Google Cloud credentials and add the redirect URL in Supabase Dashboard.
-* [ ] **Product Prices**: Review and replace placeholder prices marked `// TODO: confirm price` in [`data/products.ts`](file:///Users/pratyakshkalsi/Desktop/drria/data/products.ts).
+* [x] **Product Prices**: Confirmed and finalized across all 5 products in [`data/products.ts`](file:///Users/pratyakshkalsi/Desktop/drria/data/products.ts).
 * [ ] **Razorpay Live API Keys**: Add real Razorpay Key ID, Secret, and Webhook Secret in your production environment variables.
 * [ ] **Phone OTP (Optional)**: If enabling phone login, obtain DLT registration in India and configure SMS credentials in Supabase before toggling `NEXT_PUBLIC_ENABLE_PHONE_OTP=true`.
 * [ ] **Legal Policy Verification**: Review the standardized template text in [`app/policies/[policy]/page.tsx`](file:///Users/pratyakshkalsi/Desktop/drria/app/policies/[policy]/page.tsx) with legal counsel.

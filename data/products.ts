@@ -16,7 +16,7 @@ export interface Product {
   category: 'lips' | 'skin' | 'hair' | 'sun';
   categoryLabel: string;
   accentColor: string;
-  price: number; // TODO: confirm price
+  price: number;
   size: string;
   images: ProductImage[];
   heroImageIndex: number;
@@ -43,7 +43,7 @@ export const products: Product[] = [
     category: 'lips',
     categoryLabel: 'Lip Care',
     accentColor: '#4A7FA5',
-    price: 349, // TODO: confirm price
+    price: 290,
     size: '',
     heroImageIndex: 0,
     description:
@@ -122,7 +122,7 @@ export const products: Product[] = [
     category: 'skin',
     categoryLabel: 'Facial Care',
     accentColor: '#E8651A',
-    price: 399, // TODO: confirm price
+    price: 392,
     size: '100 ml',
     heroImageIndex: 0,
     description:
@@ -198,7 +198,7 @@ export const products: Product[] = [
     category: 'hair',
     categoryLabel: 'Hair Care',
     accentColor: '#C9952A',
-    price: 499, // TODO: confirm price
+    price: 411,
     size: '100 ml',
     heroImageIndex: 0,
     description:
@@ -287,7 +287,7 @@ export const products: Product[] = [
     category: 'skin',
     categoryLabel: 'Facial Care',
     accentColor: '#4A7FA5',
-    price: 449, // TODO: confirm price
+    price: 439,
     size: '50 gm / 1.76 oz',
     heroImageIndex: 0,
     description:
@@ -366,7 +366,7 @@ export const products: Product[] = [
     category: 'sun',
     categoryLabel: 'Sun Care',
     accentColor: '#3A7D44',
-    price: 499, // TODO: confirm price
+    price: 510,
     size: '50 ml / 1.69 fl oz',
     heroImageIndex: 0,
     description:
@@ -438,12 +438,12 @@ export const products: Product[] = [
   },
 ];
 
-// Build-time console warning listing products using placeholder prices
+// Build-time console notice: log confirmed catalog prices during build
 if (typeof window === 'undefined') {
-  console.warn(
-    '\n⚠️  BUILD NOTICE: Products using unconfirmed placeholder prices:\n' +
+  console.log(
+    '\n✓ Catalog prices confirmed:\n' +
       products
-        .map((p) => `   • ${p.name}: ₹${p.price} (TODO: confirm price)`)
+        .map((p) => `   • ${p.name}: ₹${p.price}`)
         .join('\n') +
       '\n'
   );
