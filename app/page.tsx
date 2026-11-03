@@ -13,6 +13,14 @@ export default function Home() {
 
   return (
     <>
+      <link
+        rel="preload"
+        as="image"
+        type="image/avif"
+        imageSrcSet="/images/dr-rias-collection-hero-480.avif 480w, /images/dr-rias-collection-hero-768.avif 768w, /images/dr-rias-collection-hero-1200.avif 1200w"
+        imageSizes="(max-width: 768px) 100vw, 50vw"
+        fetchPriority="high"
+      />
       <HeroSection />
       <TrustStrip />
 
@@ -43,11 +51,11 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {allProducts.map((product, index) => (
+            {allProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
-                eager={index < 3}
+                eager={false}
               />
             ))}
           </div>

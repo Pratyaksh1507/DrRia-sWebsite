@@ -36,6 +36,7 @@ const UserNav = dynamic(() => import('@/components/layout/UserNav'), {
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [shouldLoadAuth, setShouldLoadAuth] = useState(false);
   const pathname = usePathname();
 
   const openCart = useCartStore((state) => state.openCart);
@@ -45,7 +46,19 @@ export default function Header() {
   useEffect(() => {
     useCartStore.getState().initializeCart();
     setHydrated(true);
-  }, []);
+
+    const isAuthRoute =
+      pathname.startsWith('/account') ||
+      pathname.startsWith('/checkout') ||
+      pathname.startsWith('/login');
+    const hasAuthCookie =
+      typeof document !== 'undefined' &&
+      document.cookie.split(';').some((c) => c.trim().startsWith('sb-'));
+
+    if (isAuthRoute || hasAuthCookie) {
+      setShouldLoadAuth(true);
+    }
+  }, [pathname]);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -110,7 +123,40 @@ export default function Header() {
             </a>
 
             {/* User Account / Sign In Nav */}
-            <UserNav />
+            {shouldLoadAuth ? (
+              <UserNav />
+            ) : (
+              <Link
+                href={`/login?next=${encodeURIComponent(pathname)}`}
+                className="relative p-2.5 rounded-full text-[#5C3D1E] hover:text-[#C9952A] hover:bg-[#F3EBDD]/60 transition-colors focus:outline-none focus:ring-2 focus:ring-[#5C3D1E] min-w-[44px] min-h-[44px] flex items-center justify-center group"
+                aria-label="Sign in"
+                onMouseEnter={() => setShouldLoadAuth(true)}
+                onFocus={() => setShouldLoadAuth(true)}
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.75}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+                <span className="sr-only">Sign in</span>
+                {/* Tooltip on desktop */}
+                <span
+                  role="tooltip"
+                  className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#3E2914] px-2 py-1 text-[11px] font-medium text-white opacity-0 shadow-md transition-opacity group-hover:opacity-100 group-focus:opacity-100 z-50"
+                >
+                  Sign in
+                </span>
+              </Link>
+            )}
 
             {/* Shopping Cart Trigger Button */}
             <button

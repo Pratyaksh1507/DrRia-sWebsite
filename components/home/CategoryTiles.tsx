@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function CategoryTiles() {
   const categories = [
@@ -8,6 +7,10 @@ export default function CategoryTiles() {
       subtitle: 'Gentle Cleansing & Moisture',
       href: '/shop?category=skin',
       image: '/images/vita-c-face-wash-lifestyle-480.webp',
+      avifSrcSet:
+        '/images/vita-c-face-wash-lifestyle-480.avif 480w, /images/vita-c-face-wash-lifestyle-768.avif 768w',
+      webpSrcSet:
+        '/images/vita-c-face-wash-lifestyle-480.webp 480w, /images/vita-c-face-wash-lifestyle-768.webp 768w',
       accent: '#E8651A',
       textColor: '#9C3400',
       bgColor: '#FDF1EA',
@@ -17,6 +20,10 @@ export default function CategoryTiles() {
       subtitle: 'Nourishes Scalp & Strengthens Roots',
       href: '/shop?category=hair',
       image: '/images/hair-growth-oil-lifestyle-480.webp',
+      avifSrcSet:
+        '/images/hair-growth-oil-lifestyle-480.avif 480w, /images/hair-growth-oil-lifestyle-768.avif 768w',
+      webpSrcSet:
+        '/images/hair-growth-oil-lifestyle-480.webp 480w, /images/hair-growth-oil-lifestyle-768.webp 768w',
       accent: '#C9952A',
       textColor: '#7A532B',
       bgColor: '#FAF5EA',
@@ -26,6 +33,10 @@ export default function CategoryTiles() {
       subtitle: 'Deep Moisture & Protection',
       href: '/shop?category=lips',
       image: '/images/lip-balm-jar-480.webp',
+      avifSrcSet:
+        '/images/lip-balm-jar-480.avif 480w, /images/lip-balm-jar-768.avif 768w',
+      webpSrcSet:
+        '/images/lip-balm-jar-480.webp 480w, /images/lip-balm-jar-768.webp 768w',
       accent: '#4A7FA5',
       textColor: '#244E6E',
       bgColor: '#EBF3F8',
@@ -35,6 +46,10 @@ export default function CategoryTiles() {
       subtitle: 'Broad Spectrum SPF-50 PA+++',
       href: '/shop?category=sun',
       image: '/images/spf50-sunscreen-lifestyle-480.webp',
+      avifSrcSet:
+        '/images/spf50-sunscreen-lifestyle-480.avif 480w, /images/spf50-sunscreen-lifestyle-768.avif 768w',
+      webpSrcSet:
+        '/images/spf50-sunscreen-lifestyle-480.webp 480w, /images/spf50-sunscreen-lifestyle-768.webp 768w',
       accent: '#3A7D44',
       textColor: '#245C2D',
       bgColor: '#EDF6EE',
@@ -64,14 +79,27 @@ export default function CategoryTiles() {
               <div>
                 {/* Category Product Image Thumbnail */}
                 <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-4 bg-[#FDFBF7]">
-                  <Image
-                    src={cat.image}
-                    alt={`${cat.title} showcase`}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    loading="lazy"
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
-                  />
+                  <picture className="block w-full h-full">
+                    <source
+                      type="image/avif"
+                      srcSet={cat.avifSrcSet}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    />
+                    <source
+                      type="image/webp"
+                      srcSet={cat.webpSrcSet}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    />
+                    <img
+                      src={cat.image}
+                      alt={`${cat.title} showcase`}
+                      width={480}
+                      height={480}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                    />
+                  </picture>
                 </div>
 
                 <span

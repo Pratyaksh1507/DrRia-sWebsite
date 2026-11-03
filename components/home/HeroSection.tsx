@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function HeroSection() {
   return (
@@ -61,18 +60,29 @@ export default function HeroSection() {
 
           {/* Hero Image — Sole priority loaded image per performance targets */}
           <div className="lg:col-span-5 relative">
-            <div className="relative mx-auto max-w-md lg:max-w-none aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white/80 bg-white">
-              <Image
-                src="/images/dr-rias-collection-hero-480.webp"
-                alt="Dr Ria's Skin & Hair Care Collection — Complete product line on marble pedestal"
-                fill
-                priority={true}
-                fetchPriority="high"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                placeholder="blur"
-                blurDataURL="data:image/webp;base64,UklGRtwAAABXRUJQVlA4INAAAABwBACdASoUABQAPtFgqU+oJSOiKAgBABoJZgCsMy/luAHKI43+PioTSJWGAAD+uB/X/IHX53s43WoRScX2S7mV+oBJjpHkZB+2B3xsKMsXwx5+muFN4N/hgQ1ERHTim9T7ou6lC/oHLEolOF+ll8gLYhNEicJbF6+coAEQPGxbcVd2ZB9HNlTToXPWVyWMK1qH3h8ZcuabN0MtVBzsP5wBaQoO9ADJlGpJ93CZo1flOoe7usr827+URk1XPANs9X5fH8IFqv942AlxWhWRGAAA"
-                className="object-cover object-center"
-              />
+            <div className="relative mx-auto max-w-md lg:max-w-none aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white/80 bg-[#FBF6EE]">
+              <picture className="block w-full h-full">
+                <source
+                  type="image/avif"
+                  srcSet="/images/dr-rias-collection-hero-480.avif 480w, /images/dr-rias-collection-hero-768.avif 768w, /images/dr-rias-collection-hero-1200.avif 1200w"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+                <source
+                  type="image/webp"
+                  srcSet="/images/dr-rias-collection-hero-480.webp 480w, /images/dr-rias-collection-hero-768.webp 768w, /images/dr-rias-collection-hero-1200.webp 1200w"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+                <img
+                  src="/images/dr-rias-collection-hero-768.webp"
+                  alt="Dr Ria's Skin & Hair Care Collection — Complete product line on marble pedestal"
+                  width={768}
+                  height={768}
+                  fetchPriority="high"
+                  loading="eager"
+                  decoding="async"
+                  className="w-full h-full object-cover object-center"
+                />
+              </picture>
             </div>
             {/* Soft decorative badge */}
             <div className="absolute -bottom-4 -left-4 sm:bottom-4 sm:-left-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-[#E8E0D5] max-w-[200px]">

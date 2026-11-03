@@ -71,6 +71,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <>
       <ProductSchema product={product} />
+      {product.images[0] && (
+        <link
+          rel="preload"
+          as="image"
+          type="image/avif"
+          imageSrcSet={product.images[0].avifSrcSet}
+          imageSizes="(max-width: 768px) 100vw, 50vw"
+          fetchPriority="high"
+        />
+      )}
 
       <div className="py-8 sm:py-12 bg-[#FBF6EE]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

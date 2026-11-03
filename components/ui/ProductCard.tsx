@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Product } from '@/data/products';
 import { useCartStore } from '@/lib/cart';
 
@@ -29,16 +28,40 @@ export default function ProductCard({
         className="relative block w-full aspect-square bg-[#FDFBF7] overflow-hidden"
         aria-label={`View details for ${product.name}`}
       >
-        <Image
-          src={cardImg.src}
-          alt={cardImg.alt}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          loading={isEager ? 'eager' : 'lazy'}
-          placeholder={cardImg.blurDataURL ? 'blur' : 'empty'}
-          blurDataURL={cardImg.blurDataURL}
-          className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
-        />
+        <picture className="block w-full h-full">
+          {cardImg.avifSrcSet && (
+            <source
+              type="image/avif"
+              srcSet={cardImg.avifSrcSet}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          )}
+          {cardImg.webpSrcSet && (
+            <source
+              type="image/webp"
+              srcSet={cardImg.webpSrcSet}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          )}
+          <img
+            src={cardImg.src}
+            alt={cardImg.alt}
+            width={cardImg.width || 768}
+            height={cardImg.height || 768}
+            loading={isEager ? 'eager' : 'lazy'}
+            decoding="async"
+            style={
+              cardImg.blurDataURL
+                ? {
+                    backgroundImage: `url("${cardImg.blurDataURL}")`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }
+                : undefined
+            }
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+          />
+        </picture>
         {/* Category Accent Badge */}
         <div className="absolute top-3 left-3">
           <span

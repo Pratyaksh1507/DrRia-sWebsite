@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { ProductImage } from '@/data/products';
 
 interface ProductGalleryProps {
@@ -16,19 +15,44 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
   return (
     <div className="space-y-4">
       {/* Main Large Display Image */}
-      <div className="relative aspect-square w-full rounded-3xl overflow-hidden bg-white border border-[#E8E0D5] shadow-xs">
-        <Image
-          src={activeImage.src}
-          alt={activeImage.alt}
-          fill
-          priority={false}
-          loading="lazy"
-          sizes="(max-width: 768px) 100vw, 50vw"
-          placeholder={activeImage.blurDataURL ? 'blur' : 'empty'}
-          blurDataURL={activeImage.blurDataURL}
-          className="object-cover object-center transition-all duration-300"
-        />
-        <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-xs text-white text-[11px] font-medium">
+      <div className="relative aspect-square w-full rounded-3xl overflow-hidden bg-[#FBF6EE] border border-[#E8E0D5] shadow-xs">
+        <picture className="block w-full h-full">
+          {activeImage.avifSrcSet && (
+            <source
+              type="image/avif"
+              srcSet={activeImage.avifSrcSet}
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          )}
+          {activeImage.webpSrcSet && (
+            <source
+              type="image/webp"
+              srcSet={activeImage.webpSrcSet}
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          )}
+          <img
+            key={activeImage.src}
+            src={activeImage.src}
+            alt={activeImage.alt}
+            width={activeImage.width || 768}
+            height={activeImage.height || 768}
+            loading={selectedIndex === 0 ? 'eager' : 'lazy'}
+            fetchPriority={selectedIndex === 0 ? 'high' : 'auto'}
+            decoding="async"
+            style={
+              activeImage.blurDataURL
+                ? {
+                    backgroundImage: `url("${activeImage.blurDataURL}")`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }
+                : undefined
+            }
+            className="w-full h-full object-cover object-center transition-all duration-300"
+          />
+        </picture>
+        <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-xs text-white text-[11px] font-medium pointer-events-none">
           {selectedIndex + 1} / {images.length}
         </div>
       </div>
@@ -53,16 +77,31 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                   : 'border-[#E8E0D5] hover:border-[#5C3D1E]/40 opacity-80 hover:opacity-100'
               }`}
             >
-              <Image
-                src={img.src}
-                alt={img.alt}
-                fill
-                sizes="96px"
-                loading="lazy"
-                placeholder={img.blurDataURL ? 'blur' : 'empty'}
-                blurDataURL={img.blurDataURL}
-                className="object-cover"
-              />
+              <picture className="block w-full h-full">
+                {img.avifSrcSet && (
+                  <source
+                    type="image/avif"
+                    srcSet={img.avifSrcSet}
+                    sizes="96px"
+                  />
+                )}
+                {img.webpSrcSet && (
+                  <source
+                    type="image/webp"
+                    srcSet={img.webpSrcSet}
+                    sizes="96px"
+                  />
+                )}
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  width={96}
+                  height={96}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                />
+              </picture>
             </button>
           );
         })}
