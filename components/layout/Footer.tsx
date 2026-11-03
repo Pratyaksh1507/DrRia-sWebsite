@@ -154,7 +154,16 @@ export default function Footer() {
             <span className="hidden sm:inline">&bull;</span>
             <span className="text-[#C9952A] font-medium">Product design &amp; marketed by Sachin Kashyap</span>
             <span className="hidden sm:inline">&bull;</span>
-            <span className="text-[#C9952A] font-medium">Website designed &amp; developed by Pratyaksh Kalsi</span>
+            <span className="text-[#C9952A] font-medium">
+              Website designed &amp; developed by{' '}
+              <a
+                href="mailto:pratyakshkalsi9@gmail.com?subject=Website%20enquiry%20-%20Dr%20Ria's"
+                aria-label="Email Pratyaksh Kalsi"
+                className="text-[#C9952A] hover:underline focus:outline-none focus:ring-1 focus:ring-[#C9952A] rounded-xs"
+              >
+                Pratyaksh Kalsi
+              </a>
+            </span>
           </div>
           <div className="text-center md:text-right text-[11px] text-[#E8E0D5]/60">
             <span>Skincare &amp; Haircare &bull; Made in India</span>

@@ -11,12 +11,25 @@ import Logo from '@/components/Logo';
 const UserNav = dynamic(() => import('@/components/layout/UserNav'), {
   ssr: false,
   loading: () => (
-    <Link
-      href="/login"
-      className="text-xs font-semibold text-[#5C3D1E] hover:text-[#C9952A] transition-colors py-1.5 px-3 rounded-lg hover:bg-[#F3EBDD]"
+    <div
+      aria-hidden="true"
+      className="min-w-[44px] min-h-[44px] p-2.5 rounded-full text-[#5C3D1E] flex items-center justify-center"
     >
-      Sign In
-    </Link>
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.75}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+      </svg>
+    </div>
   ),
 });
 
@@ -94,17 +107,6 @@ export default function Header() {
                 <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.586 1.832.898 2.791.898h.001c3.182 0 5.77-2.587 5.77-5.767 0-3.18-2.587-5.766-5.77-5.766zm9.969 5.767c0 5.518-4.482 10-10 10-1.748 0-3.385-.45-4.814-1.239l-5.186 1.358 1.385-5.059c-.87-1.488-1.385-3.218-1.385-5.06 0-5.518 4.482-10 10-10 5.518 0 10 4.482 10 10z"/>
               </svg>
               <span>WhatsApp</span>
-            </a>
-
-            {/* Tap to Call Link (Desktop / Tablet) */}
-            <a
-              href="tel:+919469088317"
-              aria-label="Call Customer Care +91-9469088317"
-              className="hidden sm:inline-flex p-2 text-[#5C3D1E] hover:text-[#C9952A] rounded-full hover:bg-[#F3EBDD] transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
             </a>
 
             {/* User Account / Sign In Nav */}
@@ -185,12 +187,6 @@ export default function Header() {
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-[#3A7D44] text-white text-sm font-medium hover:bg-[#306637] transition-colors"
             >
               <span>Chat on WhatsApp (+91-9469088317)</span>
-            </a>
-            <a
-              href="tel:+919469088317"
-              className="flex items-center justify-center gap-2 w-full py-2 rounded-lg border border-[#5C3D1E] text-[#5C3D1E] text-sm font-medium hover:bg-[#F3EBDD] transition-colors"
-            >
-              <span>Call: +91-9469088317</span>
             </a>
           </div>
         </div>

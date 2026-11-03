@@ -91,7 +91,14 @@ export default function AboutPage() {
                 Pratyaksh Kalsi
               </h3>
               <p className="text-xs font-semibold text-[#C9952A]">
-                Website designed &amp; developed by Pratyaksh Kalsi
+                Website designed &amp; developed by{' '}
+                <a
+                  href="mailto:pratyakshkalsi9@gmail.com?subject=Website%20enquiry%20-%20Dr%20Ria's"
+                  aria-label="Email Pratyaksh Kalsi"
+                  className="text-[#C9952A] hover:underline focus:outline-none focus:ring-1 focus:ring-[#C9952A] rounded-xs"
+                >
+                  Pratyaksh Kalsi
+                </a>
               </p>
               <p className="text-xs text-[#6B6B6B] leading-relaxed">
                 Architecting the modern digital storefront, performance engineering, mobile UX, accessibility compliance, and secure checkout systems for Dr Ria&apos;s patrons.
