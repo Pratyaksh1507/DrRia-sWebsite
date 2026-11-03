@@ -40,7 +40,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico, apple-touch-icon, and public assets
      */
-    '/((?!_next/static|_next/image|favicon.ico|apple-touch-icon.png|brand/|images/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|apple-icon.png|icon.png|manifest.webmanifest|brand/|images/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|webmanifest)$).*)',
   ],
 };
 

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Logo from '@/components/Logo';
 
 export default function Footer() {
   return (
@@ -9,7 +8,24 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="space-y-4">
             <div className="pb-1">
-              <Logo variant="cream" className="h-10 w-auto object-contain" />
+              <Link
+                href="/"
+                aria-label="Dr Ria's home"
+                className="inline-block rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9952A] focus:ring-offset-2 focus:ring-offset-[#3E2914] transition-opacity hover:opacity-90"
+              >
+                <picture>
+                  <source srcSet="/brand/footer-logo-badge.webp" type="image/webp" />
+                  <img
+                    src="/brand/footer-logo-badge.png"
+                    alt="Dr Ria's logo"
+                    width={380}
+                    height={407}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-[120px] md:w-[140px] h-auto object-contain"
+                  />
+                </picture>
+              </Link>
             </div>
             <p className="text-xs sm:text-sm text-[#E8E0D5]/80 leading-relaxed">
               Skincare and haircare formulated with pure botanical extracts and targeted ingredients, crafted with care in India.

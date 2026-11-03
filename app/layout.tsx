@@ -45,10 +45,6 @@ export const metadata: Metadata = {
     'anti pigmentation lip balm',
     'botanical skincare',
   ],
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
-  },
   openGraph: {
     title: "Dr Ria's — Skincare & Haircare, Made with Care in India",
     description:
