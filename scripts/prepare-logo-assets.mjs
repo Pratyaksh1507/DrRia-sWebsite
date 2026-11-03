@@ -74,19 +74,25 @@ async function main() {
     .toFile(orgLogoWebp);
   console.log('✓ Generated public/brand/dr-rias-logo.webp (max 600px wide, optimized WebP)');
 
-  console.log('\n5. Copying footer logo badge...');
-  const footerWebpSrc = path.join(rootDir, 'source-images/logo/footer-logo-badge.webp');
-  const footerPngSrc = path.join(rootDir, 'source-images/logo/footer-logo-badge.png');
-  const footerWebpDest = path.join(rootDir, 'public/brand/footer-logo-badge.webp');
-  const footerPngDest = path.join(rootDir, 'public/brand/footer-logo-badge.png');
+  console.log('\n5. Processing transparent footer logo...');
+  const footerTransparentWebpSrc = path.join(rootDir, 'source-images/logo/footer-logo-transparent.webp');
+  const footerTransparentPngSrc = path.join(rootDir, 'source-images/logo/footer-logo-transparent.png');
+  const footerTransparentWebpDest = path.join(rootDir, 'public/brand/footer-logo-transparent.webp');
+  const footerTransparentPngDest = path.join(rootDir, 'public/brand/footer-logo-transparent.png');
 
-  await fs.copyFile(footerWebpSrc, footerWebpDest);
-  console.log('✓ Copied public/brand/footer-logo-badge.webp');
+  await sharp(footerTransparentWebpSrc)
+    .webp({ quality: 90 })
+    .toFile(footerTransparentWebpDest);
+  console.log('✓ Saved public/brand/footer-logo-transparent.webp');
 
-  await sharp(footerPngSrc)
+  await sharp(footerTransparentWebpSrc)
     .png({ compressionLevel: 9, adaptiveFiltering: true })
-    .toFile(footerPngDest);
-  console.log('✓ Optimized & saved public/brand/footer-logo-badge.png');
+    .toFile(footerTransparentPngDest);
+  console.log('✓ Generated public/brand/footer-logo-transparent.png');
+
+  if (footerTransparentPngSrc !== footerTransparentPngDest) {
+    await fs.copyFile(footerTransparentPngDest, footerTransparentPngSrc).catch(() => {});
+  }
 
   console.log('\nAll logo assets prepared successfully!');
 }
@@ -95,3 +101,4 @@ main().catch((err) => {
   console.error('Error preparing assets:', err);
   process.exit(1);
 });
+

@@ -11,18 +11,18 @@ export default function Footer() {
               <Link
                 href="/"
                 aria-label="Dr Ria's home"
-                className="inline-block rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9952A] focus:ring-offset-2 focus:ring-offset-[#3E2914] transition-opacity hover:opacity-90"
+                className="inline-block focus:outline-none focus:ring-2 focus:ring-[#C9952A] transition-opacity hover:opacity-90"
               >
                 <picture>
-                  <source srcSet="/brand/footer-logo-badge.webp" type="image/webp" />
+                  <source srcSet="/brand/footer-logo-transparent.webp" type="image/webp" />
                   <img
-                    src="/brand/footer-logo-badge.png"
+                    src="/brand/footer-logo-transparent.png"
                     alt="Dr Ria's logo"
-                    width={380}
-                    height={407}
+                    width={400}
+                    height={436}
                     loading="lazy"
                     decoding="async"
-                    className="w-[120px] md:w-[140px] h-auto object-contain"
+                    className="w-[130px] md:w-[150px] h-auto object-contain"
                   />
                 </picture>
               </Link>
