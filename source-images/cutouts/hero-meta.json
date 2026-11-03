@@ -1,0 +1,87 @@
+{
+  "desktopHotspots": {
+    "lipBalm": {
+      "slug": "anti-pigmentation-lip-balm",
+      "name": "Anti Pigmentation Lip Balm",
+      "x": "5.7",
+      "y": "66.7",
+      "w": "17.9",
+      "h": "26.7"
+    },
+    "sunscreen": {
+      "slug": "spf-50-pa-sunscreen",
+      "name": "SPF-50 PA+++ Sunscreen",
+      "x": "25.4",
+      "y": "15.6",
+      "w": "11.0",
+      "h": "71.1"
+    },
+    "hairOil": {
+      "slug": "hair-growth-oil",
+      "name": "Hair Growth Oil",
+      "x": "42.5",
+      "y": "3.7",
+      "w": "15.1",
+      "h": "83.0"
+    },
+    "faceWash": {
+      "slug": "vita-c-daily-glow-face-wash",
+      "name": "Vita C Daily Glow Face Wash",
+      "x": "62.2",
+      "y": "9.6",
+      "w": "13.9",
+      "h": "77.0"
+    },
+    "moisturizer": {
+      "slug": "hydroboost-face-moisturizer",
+      "name": "Hydroboost Face Moisturizer",
+      "x": "75.2",
+      "y": "56.3",
+      "w": "20.5",
+      "h": "37.0"
+    }
+  },
+  "mobileHotspots": {
+    "lipBalm": {
+      "slug": "anti-pigmentation-lip-balm",
+      "name": "Anti Pigmentation Lip Balm",
+      "x": "3.2",
+      "y": "71.1",
+      "w": "30.9",
+      "h": "20.7"
+    },
+    "sunscreen": {
+      "slug": "spf-50-pa-sunscreen",
+      "name": "SPF-50 PA+++ Sunscreen",
+      "x": "15.4",
+      "y": "25.9",
+      "w": "19.4",
+      "h": "56.3"
+    },
+    "hairOil": {
+      "slug": "hair-growth-oil",
+      "name": "Hair Growth Oil",
+      "x": "36.6",
+      "y": "15.6",
+      "w": "26.9",
+      "h": "66.7"
+    },
+    "faceWash": {
+      "slug": "vita-c-daily-glow-face-wash",
+      "name": "Vita C Daily Glow Face Wash",
+      "x": "61.6",
+      "y": "20.0",
+      "w": "25.0",
+      "h": "62.2"
+    },
+    "moisturizer": {
+      "slug": "hydroboost-face-moisturizer",
+      "name": "Hydroboost Face Moisturizer",
+      "x": "60.4",
+      "y": "62.2",
+      "w": "36.4",
+      "h": "29.6"
+    }
+  },
+  "blurDataURL": "data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAABwBACdASogABIAPzmCu1cvJ6WjsBgIAeAnCWoAAI8/3egeXOjDoO9F/egABAD+6oKSZviSkApCcZvTXJ98mIoTm4Ldc1wzh8C6ZuSmNTDCKZQoKN+hSgmXuXBCrtmIZNf5ZUPmn+28HBiWPICjPGpOpZyWgnO/AxzGR4hh7hd2wAAA"
+}

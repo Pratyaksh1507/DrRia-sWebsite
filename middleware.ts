@@ -43,3 +43,4 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|apple-touch-icon.png|brand/|images/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif)$).*)',
   ],
 };
+

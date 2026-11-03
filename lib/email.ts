@@ -119,3 +119,4 @@ export async function sendOrderConfirmationEmail(params: OrderEmailParams) {
     return { success: false, error };
   }
 }
+

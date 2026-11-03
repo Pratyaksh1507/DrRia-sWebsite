@@ -118,6 +118,22 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <head>
+        <link
+          rel="preload"
+          as="image"
+          href="/images/dr-rias-hero-lineup-mobile.webp"
+          media="(max-width: 1023px)"
+          type="image/webp"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/images/dr-rias-hero-lineup-desktop.webp"
+          media="(min-width: 1024px)"
+          type="image/webp"
+          fetchPriority="high"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
