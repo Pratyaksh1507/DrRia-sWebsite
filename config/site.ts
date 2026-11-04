@@ -29,7 +29,10 @@ export const SITE_CONFIG = {
   tagline: 'Skincare & Haircare, Made with Care in India',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://drrias.in',
   customerCarePhone: '+91-9469088317',
-  customerCareEmail: 'simplyria11@gmail.com',
+  customerCareEmail: 'drrias.official@gmail.com',
+  instagramUrl:
+    'https://www.instagram.com/drrias.official?psln=aHBzenR1enhmeXZ1&utm_source=qr',
+  instagramHandle: '@drrias.official',
   credits: {
     marketing: 'Sachin Kashyap',
     development: 'Pratyaksh Kalsi',

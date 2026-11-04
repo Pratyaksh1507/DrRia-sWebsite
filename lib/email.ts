@@ -76,7 +76,7 @@ export async function sendOrderConfirmationEmail(params: OrderEmailParams) {
       <div style="text-align: center; margin-top: 24px; color: #7A532B; font-size: 12px; line-height: 1.6;">
         <p style="margin: 0;">
           Need assistance with your delivery or have a question?<br />
-          Customer Care: <strong>+91-9469088317</strong> (Mon–Sat, 10 AM – 7 PM) &bull; Email: <strong>simplyria11@gmail.com</strong>
+          Customer Care: <strong>+91-9469088317</strong> (Mon–Sat, 10 AM – 7 PM) &bull; Email: <strong>drrias.official@gmail.com</strong>
         </p>
         <p style="margin: 8px 0 0; color: #8C7866; font-size: 11px;">
           Dr Ria's &bull; 93-C Shastri Nagar, Jammu, 180004

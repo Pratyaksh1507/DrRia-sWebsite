@@ -43,7 +43,7 @@ export const products: Product[] = [
     category: 'lips',
     categoryLabel: 'Lip Care',
     accentColor: '#4A7FA5',
-    price: 290,
+    price: 333,
     size: '',
     heroImageIndex: 0,
     description:
@@ -122,7 +122,7 @@ export const products: Product[] = [
     category: 'skin',
     categoryLabel: 'Facial Care',
     accentColor: '#E8651A',
-    price: 392,
+    price: 444,
     size: '100 ml',
     heroImageIndex: 0,
     description:
@@ -287,7 +287,7 @@ export const products: Product[] = [
     category: 'skin',
     categoryLabel: 'Facial Care',
     accentColor: '#4A7FA5',
-    price: 439,
+    price: 444,
     size: '50 gm / 1.76 oz',
     heroImageIndex: 0,
     description:
@@ -366,7 +366,7 @@ export const products: Product[] = [
     category: 'sun',
     categoryLabel: 'Sun Care',
     accentColor: '#3A7D44',
-    price: 510,
+    price: 555,
     size: '50 ml / 1.69 fl oz',
     heroImageIndex: 0,
     description:

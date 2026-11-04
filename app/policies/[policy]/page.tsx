@@ -51,7 +51,7 @@ const policyData: Record<
       },
       {
         heading: '2. Damaged, Defective or Incorrect Items',
-        body: 'In the rare event that your shipment arrives physically damaged in transit, leaking, or with mismatched items, please report it within 48 hours of delivery by messaging our WhatsApp support at +91-9469088317 or emailing simplyria11@gmail.com with clear unboxing photographs or video proof.',
+        body: 'In the rare event that your shipment arrives physically damaged in transit, leaking, or with mismatched items, please report it within 48 hours of delivery by messaging our WhatsApp support at +91-9469088317 or emailing drrias.official@gmail.com with clear unboxing photographs or video proof.',
       },
       {
         heading: '3. Replacement Process',

@@ -14,5 +14,8 @@ export const STORE_CONFIG = {
 
   // Support contacts
   CUSTOMER_CARE_PHONE: '+91-9469088317',
-  CUSTOMER_CARE_EMAIL: 'simplyria11@gmail.com',
+  CUSTOMER_CARE_EMAIL: 'drrias.official@gmail.com',
+  INSTAGRAM_URL:
+    'https://www.instagram.com/drrias.official?psln=aHBzenR1enhmeXZ1&utm_source=qr',
+  INSTAGRAM_HANDLE: '@drrias.official',
 } as const;
