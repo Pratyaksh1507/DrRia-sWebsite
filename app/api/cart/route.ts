@@ -2,6 +2,17 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getProductBySlug } from '@/data/products';
+import { createUpdateCartSchema } from '@/lib/cart-schema';
+
+// Strict Zod schema for cart mutations
+export const updateCartSchema = createUpdateCartSchema(
+  (slug) => getProductBySlug(slug) !== undefined
+);
+
+interface RawCartItem {
+  slug?: string;
+  quantity?: number;
+}
 
 export async function GET() {
   try {
@@ -25,8 +36,10 @@ export async function GET() {
       console.warn('[Cart Fetch Error]', error);
     }
 
-    const rawItems: Array<{ slug: string; quantity: number }> =
-      cartRecord?.items && Array.isArray(cartRecord.items) ? cartRecord.items : [];
+    const rawItems: RawCartItem[] =
+      cartRecord?.items && Array.isArray(cartRecord.items)
+        ? (cartRecord.items as RawCartItem[])
+        : [];
 
     const validatedItems = [];
     let droppedCount = 0;
@@ -62,7 +75,7 @@ export async function GET() {
       items: validatedItems,
       droppedCount,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[Cart GET Exception]', err);
     return NextResponse.json({ items: [], droppedCount: 0 });
   }
@@ -79,15 +92,22 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const rawItems = Array.isArray(body?.items) ? body.items : [];
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
+    }
 
-    const cleanItems = rawItems
-      .filter((i: any) => i && typeof i.slug === 'string')
-      .map((i: any) => ({
-        slug: i.slug,
-        quantity: Math.min(10, Math.max(1, Number(i.quantity) || 1)),
-      }));
+    const validation = updateCartSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.issues[0].message, issues: validation.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const { items: cleanItems } = validation.data;
 
     const adminSupabase = createAdminClient();
     const { error } = await adminSupabase.from('carts').upsert({
@@ -101,10 +121,11 @@ export async function PUT(request: Request) {
     }
 
     return NextResponse.json({ success: true, count: cleanItems.length });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[Cart PUT Exception]', err);
+    const message = err instanceof Error ? err.message : 'Failed to save cart';
     return NextResponse.json(
-      { error: err.message || 'Failed to save cart' },
+      { error: message },
       { status: 500 }
     );
   }
@@ -125,10 +146,11 @@ export async function DELETE() {
     await adminSupabase.from('carts').delete().eq('user_id', user.id);
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[Cart DELETE Exception]', err);
+    const message = err instanceof Error ? err.message : 'Failed to clear cart';
     return NextResponse.json(
-      { error: err.message || 'Failed to clear cart' },
+      { error: message },
       { status: 500 }
     );
   }

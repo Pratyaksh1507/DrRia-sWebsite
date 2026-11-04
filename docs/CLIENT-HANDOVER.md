@@ -96,8 +96,9 @@ Sends automated email receipts to customers as soon as payment is verified.
    - Add the 3 generated DNS records (DKIM, SPF, MX) into your domain registrar (GoDaddy, Namecheap, or Cloudflare).
 3. **Generate API Key:**
    - Go to **API Keys** -> **Create API Key**.
-   - Copy the key (starts with `re_...`) and paste it into your environment:
+   - Copy the key (starts with `re_...`) and paste it into your environment (`RESEND_API_KEY` or `EMAIL_PROVIDER_API_KEY`):
      ```env
+     RESEND_API_KEY=re_xxxxxxxxxxxxxxxx
      EMAIL_PROVIDER_API_KEY=re_xxxxxxxxxxxxxxxx
      EMAIL_FROM=Dr Ria's Skincare <orders@drrias.in>
      ```

@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "node --test tests/**/*.test.mjs",
     "convert-images": "node scripts/convert-images.mjs"
   },
   "dependencies": {

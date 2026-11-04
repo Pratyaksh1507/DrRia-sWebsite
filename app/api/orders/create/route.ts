@@ -4,21 +4,7 @@ import { getProductBySlug } from '@/data/products';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderConfirmationEmail } from '@/lib/email';
-
-// In-memory rate limiter per IP / User
-const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
-function checkRateLimit(key: string, limit = 15, windowMs = 60000) {
-  const now = Date.now();
-  const entry = rateLimitMap.get(key) || { count: 0, lastReset: now };
-  if (now - entry.lastReset > windowMs) {
-    entry.count = 1;
-    entry.lastReset = now;
-  } else {
-    entry.count += 1;
-  }
-  rateLimitMap.set(key, entry);
-  return entry.count <= limit;
-}
+import { checkRateLimit } from '@/lib/rate-limit';
 
 const createOrderSchema = z.object({
   items: z
@@ -221,10 +207,11 @@ export async function POST(request: Request) {
       keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
       isCod: paymentMethod === 'cod',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Order Creation Exception]', error);
+    const message = error instanceof Error ? error.message : 'Internal server error while creating order.';
     return NextResponse.json(
-      { error: error.message || 'Internal server error while creating order.' },
+      { error: message },
       { status: 500 }
     );
   }

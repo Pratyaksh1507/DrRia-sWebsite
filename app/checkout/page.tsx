@@ -245,8 +245,18 @@ export default function CheckoutPage() {
             });
 
             const verifyData = await verifyRes.json();
-            if (!verifyRes.ok) {
-              throw new Error(verifyData.error || 'Payment signature verification failed.');
+
+            // Handle payment received on cancelled order
+            if (verifyData.code === 'ORDER_CANCELLED_PAYMENT_RECEIVED') {
+              clearCart();
+              router.push(
+                `/thank-you?orderId=${orderData.orderId}&status=cancelled_payment&paymentId=${rzpRes.razorpay_payment_id}`
+              );
+              return;
+            }
+
+            if (!verifyRes.ok || !verifyData.success) {
+              throw new Error(verifyData.error || verifyData.message || 'Payment signature verification failed.');
             }
 
             clearCart();
