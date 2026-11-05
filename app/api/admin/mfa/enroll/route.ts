@@ -13,6 +13,24 @@ const enrollVerifySchema = z
   .strict();
 
 export async function GET() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (
+    !supabaseUrl ||
+    !supabaseKey ||
+    supabaseUrl.includes('placeholder') ||
+    supabaseKey.includes('placeholder')
+  ) {
+    console.error('[Admin Auth] config missing: Supabase URL or publishable key not configured.');
+    return NextResponse.json(
+      { error: 'Service temporarily unavailable' },
+      { status: 503 }
+    );
+  }
+
   try {
     const supabase = await createClient();
     const {
@@ -73,6 +91,24 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (
+    !supabaseUrl ||
+    !supabaseKey ||
+    supabaseUrl.includes('placeholder') ||
+    supabaseKey.includes('placeholder')
+  ) {
+    console.error('[Admin Auth] config missing: Supabase URL or publishable key not configured.');
+    return NextResponse.json(
+      { error: 'Service temporarily unavailable' },
+      { status: 503 }
+    );
+  }
+
   const ip = request.headers.get('x-forwarded-for') || 'local';
 
   if (!checkRateLimit(`admin_mfa_enroll_${ip}`, 5, 10 * 60 * 1000)) {

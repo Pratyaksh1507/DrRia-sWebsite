@@ -12,6 +12,24 @@ const mfaChallengeSchema = z
   .strict();
 
 export async function POST(request: Request) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (
+    !supabaseUrl ||
+    !supabaseKey ||
+    supabaseUrl.includes('placeholder') ||
+    supabaseKey.includes('placeholder')
+  ) {
+    console.error('[Admin Auth] config missing: Supabase URL or publishable key not configured.');
+    return NextResponse.json(
+      { error: 'Service temporarily unavailable' },
+      { status: 503 }
+    );
+  }
+
   const ip = request.headers.get('x-forwarded-for') || 'local';
 
   // Rate limit MFA verification attempts: 5 attempts per 10 mins

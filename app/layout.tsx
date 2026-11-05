@@ -6,6 +6,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CartDrawerWrapper from '@/components/cart/CartDrawerWrapper';
 import SkipToContent from '@/components/layout/SkipToContent';
+import { getSiteUrl } from '@/lib/site-url';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -23,7 +24,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://drrias.in'),
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: "Dr Ria's — Skincare & Haircare, Made with Care in India",
     template: "%s | Dr Ria's",
@@ -31,8 +32,8 @@ export const metadata: Metadata = {
   description:
     "Dr Ria's skincare and haircare crafted with botanical extracts and targeted ingredients. Explore lip balm, face wash, hair oil, moisturizer and SPF-50 sunscreen.",
   authors: [
-    { name: 'Sachin Kashyap', url: 'https://drrias.in/about' },
-    { name: 'Pratyaksh Kalsi', url: 'https://drrias.in/about' },
+    { name: 'Sachin Kashyap', url: `${getSiteUrl()}/about` },
+    { name: 'Pratyaksh Kalsi', url: `${getSiteUrl()}/about` },
   ],
   creator: 'Pratyaksh Kalsi',
   publisher: "Dr Ria's",
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
     title: "Dr Ria's — Skincare & Haircare, Made with Care in India",
     description:
       'Botanical extracts and thoughtful formulas crafted with care in India. Transparent ingredients on every label.',
-    url: 'https://drrias.in',
+    url: getSiteUrl(),
     siteName: "Dr Ria's",
     locale: 'en_IN',
     type: 'website',
@@ -92,8 +93,8 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: "Dr Ria's",
-    url: 'https://drrias.in',
-    logo: 'https://drrias.in/brand/dr-rias-logo.png',
+    url: getSiteUrl(),
+    logo: `${getSiteUrl()}/brand/dr-rias-logo.png`,
     description:
       'Skincare and haircare formulated with botanical extracts and targeted ingredients, made with care in India.',
     contactPoint: {

@@ -36,6 +36,25 @@ export async function POST(request: Request) {
 
     const { email, password } = validation.data;
 
+    // Pre-flight check: verify Supabase environment configuration
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey =
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (
+      !supabaseUrl ||
+      !supabaseKey ||
+      supabaseUrl.includes('placeholder') ||
+      supabaseKey.includes('placeholder')
+    ) {
+      console.error('[Admin Auth] config missing: Supabase URL or publishable key not configured.');
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
+
     // 2. Authenticate against Supabase Auth
     const supabase = await createClient();
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -44,6 +63,9 @@ export async function POST(request: Request) {
     });
 
     if (authError || !authData.user) {
+      if (authError) {
+        console.warn(`[Admin Auth] GoTrue rejection: ${authError.message} (status: ${authError.status || 400})`);
+      }
       await logAdminAudit({
         action: 'failed_admin_login',
         entityType: 'auth',

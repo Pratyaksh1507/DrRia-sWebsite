@@ -7,6 +7,7 @@ import ProductActions from '@/components/product/ProductActions';
 import ProductAccordions from '@/components/product/ProductAccordions';
 import ProductSchema from '@/components/product/ProductSchema';
 import ProductCard from '@/components/ui/ProductCard';
+import { getSiteUrl } from '@/lib/site-url';
 
 interface ProductPageProps {
   params: Promise<{
@@ -40,7 +41,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     openGraph: {
       title: `${product.name} | Dr Ria's`,
       description: product.description,
-      url: `https://drrias.in/products/${product.slug}`,
+      url: `${getSiteUrl()}/products/${product.slug}`,
       images: [
         {
           url: primaryImg,

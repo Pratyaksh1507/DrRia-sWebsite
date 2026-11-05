@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { getSiteUrl } from '@/lib/site-url';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/checkout', '/thank-you', '/admin', '/admin/*', '/api/admin/*'],
     },
-    sitemap: 'https://drrias.in/sitemap.xml',
+    sitemap: `${getSiteUrl()}/sitemap.xml`,
   };
 }
