@@ -1,7 +1,7 @@
 -- Dr Ria's Audit Logs Table Migration
--- Migration: 20261104_audit_logs.sql
+-- Migration: 20261104110000_audit_logs.sql
 -- Description:
--- Adds public.audit_logs table for durable, tamper-evident recording of critical security,
+-- Adds public.audit_logs table for durable, append-only recording of critical security,
 -- payment discrepancies, and administrative actions (e.g. payment received on cancelled order).
 
 create table if not exists public.audit_logs (

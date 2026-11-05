@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getProductBySlug } from '@/data/products';
+import { getProductBySlug, isValidProductSlug } from '@/lib/products';
 import { createUpdateCartSchema } from '@/lib/cart-schema';
 
 // Strict Zod schema for cart mutations
 export const updateCartSchema = createUpdateCartSchema(
-  (slug) => getProductBySlug(slug) !== undefined
+  (slug) => isValidProductSlug(slug)
 );
 
 interface RawCartItem {
@@ -46,8 +46,8 @@ export async function GET() {
 
     for (const raw of rawItems) {
       if (!raw || !raw.slug) continue;
-      const product = getProductBySlug(raw.slug);
-      if (!product) {
+      const product = await getProductBySlug(raw.slug);
+      if (!product || product.isActive === false) {
         droppedCount += 1;
         continue;
       }
@@ -108,6 +108,17 @@ export async function PUT(request: Request) {
     }
 
     const { items: cleanItems } = validation.data;
+
+    // Reject inactive products from being persisted in the cart
+    for (const item of cleanItems) {
+      const prod = await getProductBySlug(item.slug);
+      if (!prod || prod.isActive === false) {
+        return NextResponse.json(
+          { error: `Product is not available for purchase: ${item.slug}` },
+          { status: 400 }
+        );
+      }
+    }
 
     const adminSupabase = createAdminClient();
     const { error } = await adminSupabase.from('carts').upsert({

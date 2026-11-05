@@ -1,9 +1,9 @@
 import { MetadataRoute } from 'next';
-import { getAllProducts } from '@/data/products';
+import { getAllProducts } from '@/lib/products';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://drrias.in';
-  const products = getAllProducts();
+  const products = await getAllProducts();
   const buildDate = '2026-11-02';
 
   const productEntries: MetadataRoute.Sitemap = products.map((product) => ({

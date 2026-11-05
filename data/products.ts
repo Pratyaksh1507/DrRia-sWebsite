@@ -17,6 +17,8 @@ export interface Product {
   categoryLabel: string;
   accentColor: string;
   price: number;
+  mrp?: number;
+  discountPercentage?: number;
   size: string;
   images: ProductImage[];
   heroImageIndex: number;
@@ -32,6 +34,10 @@ export interface Product {
   badges?: string[];
   description: string;
   inStock: boolean;
+  stockQuantity?: number;
+  hsnCode?: string;
+  taxRate?: number;
+  isActive?: boolean;
 }
 
 export const products: Product[] = [
@@ -449,6 +455,14 @@ if (typeof window === 'undefined') {
   );
 }
 
+export function getProductBySlugSync(slug: string): Product | undefined {
+  return products.find((p) => p.slug === slug);
+}
+
+export function getAllProductsSync(): Product[] {
+  return products;
+}
+
 export function getProductBySlug(slug: string): Product | undefined {
   return products.find((p) => p.slug === slug);
 }
@@ -464,4 +478,8 @@ export function getProductsByCategory(category: string): Product[] {
 
 export function getRelatedProducts(currentSlug: string, count = 3): Product[] {
   return products.filter((p) => p.slug !== currentSlug).slice(0, count);
+}
+
+export function isValidProductSlug(slug: string): boolean {
+  return products.some((p) => p.slug === slug);
 }

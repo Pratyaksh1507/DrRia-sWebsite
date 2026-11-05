@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   const { response, user } = await updateSession(request);
@@ -19,6 +19,27 @@ export async function middleware(request: NextRequest) {
       const redirectUrl = new URL('/login', request.url);
       redirectUrl.searchParams.set('next', `${pathname}${search}`);
       return NextResponse.redirect(redirectUrl);
+    }
+  }
+
+  // Admin Area Protection
+  if (pathname.startsWith('/admin')) {
+    const isPublicAdminRoute =
+      pathname === '/admin/login' || pathname.startsWith('/admin/mfa');
+
+    if (!isPublicAdminRoute && !user) {
+      const loginUrl = new URL('/admin/login', request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (user) {
+      // Refresh 30-minute admin activity heartbeat cookie
+      response.cookies.set('drria_admin_last_activity', Date.now().toString(), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+      });
     }
   }
 

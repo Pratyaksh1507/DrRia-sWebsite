@@ -135,8 +135,12 @@ export default function RootLayout({
         <main id="main-content" className="flex-1 focus:outline-none">
           {children}
         </main>
-        <Footer />
-        <CartDrawerWrapper />
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
+        <Suspense fallback={null}>
+          <CartDrawerWrapper />
+        </Suspense>
       </body>
     </html>
   );

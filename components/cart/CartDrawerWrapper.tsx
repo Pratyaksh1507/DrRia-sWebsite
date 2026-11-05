@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
 import { useCartStore } from '@/lib/cart';
 
 const CartDrawer = dynamic(() => import('@/components/cart/CartDrawer'), {
@@ -8,7 +9,8 @@ const CartDrawer = dynamic(() => import('@/components/cart/CartDrawer'), {
 });
 
 export default function CartDrawerWrapper() {
+  const pathname = usePathname();
   const isOpen = useCartStore((state) => state.isOpen);
-  if (!isOpen) return null;
+  if (pathname?.startsWith('/admin') || !isOpen) return null;
   return <CartDrawer />;
 }

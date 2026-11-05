@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getAllProducts, getProductBySlug, getRelatedProducts } from '@/data/products';
+import { getAllProducts, getProductBySlug, getRelatedProducts } from '@/lib/products';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductAccordions from '@/components/product/ProductAccordions';
@@ -15,15 +15,16 @@ interface ProductPageProps {
 }
 
 export async function generateStaticParams() {
-  const products = getAllProducts();
+  const products = await getAllProducts();
   return products.map((product) => ({
     slug: product.slug,
   }));
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  'use cache';
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     return {
@@ -59,14 +60,15 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
+  'use cache';
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
 
-  if (!product) {
+  if (!product || product.isActive === false) {
     notFound();
   }
 
-  const related = getRelatedProducts(product.slug, 3);
+  const related = await getRelatedProducts(product.slug, 3);
 
   return (
     <>
@@ -133,15 +135,35 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div className="p-4 rounded-2xl bg-white border border-[#E8E0D5] flex items-baseline justify-between shadow-2xs">
                 <div>
                   <span className="block text-[11px] uppercase tracking-wider text-[#6B6B6B]">
-                    M.R.P. (Incl. of all taxes)
+                    Price (Incl. of all taxes)
                   </span>
-                  <span className="font-serif text-2xl sm:text-3xl font-bold text-[#5C3D1E]">
-                    ₹{product.price.toLocaleString('en-IN')}
-                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-serif text-2xl sm:text-3xl font-bold text-[#5C3D1E]">
+                      ₹{product.price.toLocaleString('en-IN')}
+                    </span>
+                    {product.mrp && product.mrp > product.price && (
+                      <>
+                        <span className="text-sm line-through text-[#6B6B6B]/80">
+                          ₹{product.mrp.toLocaleString('en-IN')}
+                        </span>
+                        <span className="text-xs font-bold text-[#C9952A]">
+                          {product.discountPercentage || Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#EDF6EE] text-[#3A7D44]">
-                  In Stock &bull; Dispatches in 24h
-                </span>
+                {product.inStock ? (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#EDF6EE] text-[#3A7D44]">
+                    {product.stockQuantity !== undefined && product.stockQuantity > 0 && product.stockQuantity <= 5
+                      ? `Only ${product.stockQuantity} left &bull; Dispatches in 24h`
+                      : 'In Stock &bull; Dispatches in 24h'}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700">
+                    Out of Stock
+                  </span>
+                )}
               </div>
 
               {/* Description */}

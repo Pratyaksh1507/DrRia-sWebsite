@@ -18,8 +18,14 @@ export async function GET(request: Request) {
     Boolean(val && val.trim() !== '' && !val.includes('placeholder') && !val.includes('your_'));
 
   const supabaseUrlPresent = isPresent(process.env.NEXT_PUBLIC_SUPABASE_URL);
-  const supabaseAnonPresent = isPresent(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-  const supabaseServicePresent = isPresent(process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const supabaseKeyPresent = isPresent(
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+  const supabaseServicePresent = isPresent(
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
 
   const googlePresent = isPresent(process.env.GOOGLE_CLIENT_ID) ||
     process.env.NEXT_PUBLIC_GOOGLE_AUTH_CONFIGURED === 'true';
@@ -34,7 +40,7 @@ export async function GET(request: Request) {
   const razorpaySecretPresent = isPresent(process.env.RAZORPAY_KEY_SECRET);
 
   const services = {
-    supabase: supabaseUrlPresent && supabaseAnonPresent,
+    supabase: supabaseUrlPresent && supabaseKeyPresent,
     supabaseServiceRole: supabaseServicePresent,
     googleAuth: googlePresent,
     sms: smsPresent,

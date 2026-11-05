@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getProductBySlug } from '@/data/products';
+import { getProductBySlug } from '@/lib/products';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderConfirmationEmail } from '@/lib/email';
@@ -95,10 +95,10 @@ export async function POST(request: Request) {
     }> = [];
 
     for (const item of items) {
-      const product = getProductBySlug(item.slug);
-      if (!product) {
+      const product = await getProductBySlug(item.slug);
+      if (!product || product.isActive === false || !product.inStock) {
         return NextResponse.json(
-          { error: `Product not found: ${item.slug}` },
+          { error: `Product not available for purchase: ${item.slug}` },
           { status: 400 }
         );
       }
