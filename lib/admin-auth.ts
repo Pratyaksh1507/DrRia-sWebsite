@@ -209,11 +209,11 @@ export async function requireRecentAuth(
     } = await supabase.auth.getUser();
     if (!user) return false;
     userId = user.id;
+  }
 
-    if (!sessionId) {
-      const cookieStore = await cookies();
-      sessionId = extractSessionIdFromCookies(cookieStore.getAll(), user.id);
-    }
+  if (!sessionId) {
+    const cookieStore = await cookies();
+    sessionId = extractSessionIdFromCookies(cookieStore.getAll(), userId);
   }
 
   if (!userId || !sessionId) return false;

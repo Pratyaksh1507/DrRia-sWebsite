@@ -642,4 +642,158 @@ describe('Phase 1: Single-Admin Authentication & Authorization Tests', () => {
       assert.equal(extracted, 'supabase-jwt-session-uuid-1234');
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // SENSITIVE ADMIN MUTATION STEP-UP MFA ENFORCEMENT
+  // ---------------------------------------------------------------------------
+  describe('Admin Mutation Step-Up MFA Enforcement', () => {
+    const adminId = 'd7b1e840-025c-4f51-b0e2-8951b14f6b01';
+    const customerId = 'c1a2e340-9999-4a51-b0e2-000000000000';
+    const sessionId = 'sess-uuid-admin-mfa-stepup-1234';
+    const testSecret = 'test-secret-key-at-least-32-chars-long-abcdef012345';
+
+    function evaluateMutationAccess({
+      user,
+      isAdmin,
+      aal,
+      mfaCookie,
+      currentTime = Date.now(),
+    }) {
+      // 1. Core API Guard (requireAdminApi)
+      if (!user) {
+        return { status: 401, error: 'Unauthorized: Authentication required' };
+      }
+      if (!isAdmin) {
+        return { status: 403, error: 'Forbidden: Admin access denied' };
+      }
+      if (aal !== 'aal2') {
+        return { status: 403, error: 'Forbidden: MFA verification required (AAL2 required)' };
+      }
+
+      // 2. Step-Up Recent MFA Guard (requireRecentAuth)
+      const mfaCheck = verifySignedAdminCookieValue({
+        cookieValue: mfaCookie,
+        type: 'mfa_verified',
+        userId: user.id,
+        sessionId,
+        maxAgeMs: 10 * 60 * 1000,
+        currentTime,
+        secret: testSecret,
+      });
+
+      if (!mfaCheck.valid) {
+        return {
+          status: 403,
+          error: 'Recent MFA verification required. Please complete authentication challenge.',
+          code: 'mfa_challenge_required',
+          reason: mfaCheck.reason,
+        };
+      }
+
+      return { status: 200, success: true };
+    }
+
+    it('rejects mutation when recent MFA cookie is missing despite valid AAL2 session', () => {
+      const result = evaluateMutationAccess({
+        user: { id: adminId },
+        isAdmin: true,
+        aal: 'aal2',
+        mfaCookie: null, // No recent MFA cookie
+      });
+
+      assert.equal(result.status, 403);
+      assert.equal(result.code, 'mfa_challenge_required');
+      assert.equal(result.reason, 'missing');
+    });
+
+    it('rejects mutation when recent MFA cookie is expired (>10 minutes)', () => {
+      const now = Date.now();
+      const expiredMfaCookie = createSignedAdminCookieValue({
+        type: 'mfa_verified',
+        userId: adminId,
+        sessionId,
+        timestamp: now - 11 * 60 * 1000, // 11 mins ago
+        secret: testSecret,
+      });
+
+      const result = evaluateMutationAccess({
+        user: { id: adminId },
+        isAdmin: true,
+        aal: 'aal2',
+        mfaCookie: expiredMfaCookie,
+        currentTime: now,
+      });
+
+      assert.equal(result.status, 403);
+      assert.equal(result.code, 'mfa_challenge_required');
+      assert.equal(result.reason, 'expired');
+    });
+
+    it('accepts mutation when admin has verified AAL2 and authentic recent MFA within 10 minutes', () => {
+      const now = Date.now();
+      const validMfaCookie = createSignedAdminCookieValue({
+        type: 'mfa_verified',
+        userId: adminId,
+        sessionId,
+        timestamp: now - 2 * 60 * 1000, // 2 mins ago
+        secret: testSecret,
+      });
+
+      const result = evaluateMutationAccess({
+        user: { id: adminId },
+        isAdmin: true,
+        aal: 'aal2',
+        mfaCookie: validMfaCookie,
+        currentTime: now,
+      });
+
+      assert.equal(result.status, 200);
+      assert.equal(result.success, true);
+    });
+
+    it('strictly denies ordinary authenticated customer regardless of any MFA cookie state', () => {
+      const now = Date.now();
+      const forgedCookie = createSignedAdminCookieValue({
+        type: 'mfa_verified',
+        userId: customerId,
+        sessionId,
+        timestamp: now,
+        secret: testSecret,
+      });
+
+      const result = evaluateMutationAccess({
+        user: { id: customerId },
+        isAdmin: false, // Normal customer
+        aal: 'aal2',
+        mfaCookie: forgedCookie,
+      });
+
+      assert.equal(result.status, 403);
+      assert.equal(result.error, 'Forbidden: Admin access denied');
+      assert.equal(result.code, undefined); // Rejected before step-up evaluation
+    });
+
+    it('verifies Route Handlers enforce requireRecentAuth on all sensitive endpoints', () => {
+      const routes = [
+        path.resolve(process.cwd(), 'app/api/admin/products/route.ts'),
+        path.resolve(process.cwd(), 'app/api/admin/products/[id]/route.ts'),
+        path.resolve(process.cwd(), 'app/api/admin/products/upload/route.ts'),
+      ];
+
+      for (const routePath of routes) {
+        assert.equal(fs.existsSync(routePath), true, `Route must exist: ${routePath}`);
+        const content = fs.readFileSync(routePath, 'utf8');
+        assert.match(
+          content,
+          /requireRecentAuth/,
+          `${path.basename(routePath)} must call requireRecentAuth`
+        );
+        assert.match(
+          content,
+          /mfa_challenge_required/,
+          `${path.basename(routePath)} must return mfa_challenge_required code`
+        );
+      }
+    });
+  });
 });

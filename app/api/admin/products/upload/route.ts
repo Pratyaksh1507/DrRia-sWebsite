@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAdminApi } from '@/lib/admin-auth';
+import { requireAdminApi, requireRecentAuth } from '@/lib/admin-auth';
 import { createClient } from '@/lib/supabase/server';
 import { logAuditEvent } from '@/lib/audit';
 
@@ -12,6 +12,17 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: auth.errorResponse.error },
       { status: auth.errorResponse.status }
+    );
+  }
+
+  const recentMfa = await requireRecentAuth(10, { userId: auth.user.id });
+  if (!recentMfa) {
+    return NextResponse.json(
+      {
+        error: 'Recent MFA verification required. Please complete authentication challenge.',
+        code: 'mfa_challenge_required',
+      },
+      { status: 403 }
     );
   }
 

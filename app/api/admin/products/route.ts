@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { requireAdminApi } from '@/lib/admin-auth';
+import { requireAdminApi, requireRecentAuth } from '@/lib/admin-auth';
 import { queryDb } from '@/lib/db';
 import { logAuditEvent } from '@/lib/audit';
 
@@ -60,6 +60,17 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: auth.errorResponse.error },
       { status: auth.errorResponse.status }
+    );
+  }
+
+  const hasRecentMfa = await requireRecentAuth(10, { userId: auth.user.id });
+  if (!hasRecentMfa) {
+    return NextResponse.json(
+      {
+        error: 'Recent MFA verification required. Please complete authentication challenge.',
+        code: 'mfa_challenge_required',
+      },
+      { status: 403 }
     );
   }
 

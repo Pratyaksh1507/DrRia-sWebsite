@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { requireAdminApi } from '@/lib/admin-auth';
+import { requireAdminApi, requireRecentAuth } from '@/lib/admin-auth';
 import { queryDb } from '@/lib/db';
 import { logAuditEvent } from '@/lib/audit';
 
@@ -37,6 +37,17 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     return NextResponse.json(
       { error: auth.errorResponse.error },
       { status: auth.errorResponse.status }
+    );
+  }
+
+  const recentMfa = await requireRecentAuth(10, { userId: auth.user.id });
+  if (!recentMfa) {
+    return NextResponse.json(
+      {
+        error: 'Recent MFA verification required. Please complete authentication challenge.',
+        code: 'mfa_challenge_required',
+      },
+      { status: 403 }
     );
   }
 
@@ -209,6 +220,77 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     console.error('[Admin Product Update Error]', err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Database update error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request, { params }: RouteParams) {
+  const auth = await requireAdminApi(request);
+  if (!auth.authorized) {
+    return NextResponse.json(
+      { error: auth.errorResponse.error },
+      { status: auth.errorResponse.status }
+    );
+  }
+
+  const recentMfa = await requireRecentAuth(10, { userId: auth.user.id });
+  if (!recentMfa) {
+    return NextResponse.json(
+      {
+        error: 'Recent MFA verification required. Please complete authentication challenge.',
+        code: 'mfa_challenge_required',
+      },
+      { status: 403 }
+    );
+  }
+
+  const { id } = await params;
+  if (!id) {
+    return NextResponse.json({ error: 'Product ID required' }, { status: 400 });
+  }
+
+  const ip = request.headers.get('x-forwarded-for') || null;
+
+  try {
+    const currentRes = await queryDb(
+      `SELECT * FROM public.products WHERE id = $1 AND deleted_at IS NULL LIMIT 1;`,
+      [id]
+    );
+
+    if (currentRes.rows.length === 0) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+
+    const current = currentRes.rows[0];
+
+    // Soft delete to preserve foreign-key integrity in orders
+    await queryDb(
+      `UPDATE public.products SET deleted_at = NOW(), is_active = false WHERE id = $1;`,
+      [id]
+    );
+
+    await logAuditEvent({
+      adminId: auth.user.id,
+      action: 'product_deleted',
+      entityType: 'products',
+      entityId: id,
+      oldValue: { name: current.name, slug: current.slug, is_active: current.is_active },
+      newValue: { deleted_at: new Date().toISOString(), is_active: false },
+      ip,
+    });
+
+    try {
+      revalidatePath('/', 'layout');
+      revalidatePath('/shop');
+      revalidatePath(`/products/${current.slug}`);
+    } catch {}
+
+    return NextResponse.json({ success: true, message: 'Product deleted successfully' });
+  } catch (err: unknown) {
+    console.error('[Admin Product Delete Error]', err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Database delete error' },
       { status: 500 }
     );
   }
