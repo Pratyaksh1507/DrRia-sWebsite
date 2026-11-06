@@ -3,19 +3,30 @@ import { cookies } from 'next/headers';
 import type { User } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import {
+  extractSessionIdFromCookies,
+  verifySignedAdminCookieValue,
+  ADMIN_LAST_ACTIVITY_COOKIE,
+  ADMIN_MFA_VERIFIED_COOKIE,
+  ADMIN_SESSION_TIMEOUT_MS,
+} from './admin-cookie.ts';
 
 export {
   ADMIN_SESSION_TIMEOUT_MS,
   ADMIN_LAST_ACTIVITY_COOKIE,
   ADMIN_MFA_VERIFIED_COOKIE,
+  extractSessionId,
+  extractSessionIdFromCookies,
+  createSignedAdminCookieValue,
+  verifySignedAdminCookieValue,
+  setSignedAdminActivityCookie,
+  setSignedAdminMfaVerifiedCookie,
+  getAdminCookieSecret,
+} from './admin-cookie.ts';
+export {
   type AdminAuthCheckResult,
   evaluateAdminSession,
-} from './admin-evaluator';
-import {
-  ADMIN_SESSION_TIMEOUT_MS,
-  ADMIN_LAST_ACTIVITY_COOKIE,
-  ADMIN_MFA_VERIFIED_COOKIE,
-} from './admin-evaluator';
+} from './admin-evaluator.ts';
 
 /**
  * Server Component / Page Guard:
@@ -70,12 +81,20 @@ export async function requireAdmin(): Promise<User> {
     redirect('/admin/mfa/challenge');
   }
 
-  // Inactivity timeout check (30 minutes)
+  // Mandatory inactivity timeout check (30 minutes) with HMAC signature and user/session binding
   const cookieStore = await cookies();
-  const lastActivityStr = cookieStore.get(ADMIN_LAST_ACTIVITY_COOKIE)?.value;
-  const lastActivity = lastActivityStr ? parseInt(lastActivityStr, 10) : Date.now();
+  const sessionId = extractSessionIdFromCookies(cookieStore.getAll(), user.id);
+  const lastActivityCookie = cookieStore.get(ADMIN_LAST_ACTIVITY_COOKIE)?.value;
 
-  if (Date.now() - lastActivity > ADMIN_SESSION_TIMEOUT_MS) {
+  const activityCheck = verifySignedAdminCookieValue({
+    cookieValue: lastActivityCookie,
+    type: 'last_activity',
+    userId: user.id,
+    sessionId,
+    maxAgeMs: ADMIN_SESSION_TIMEOUT_MS,
+  });
+
+  if (!activityCheck.valid) {
     redirect('/admin/login?error=session_timeout');
   }
 
@@ -144,18 +163,28 @@ export async function requireAdminApi(request?: Request): Promise<
     };
   }
 
-  // Cookie inactivity check
+  // Mandatory inactivity timeout check (30 minutes) with HMAC signature & user/session binding. Fails closed.
   const cookieStore = await cookies();
-  const lastActivityStr = cookieStore.get(ADMIN_LAST_ACTIVITY_COOKIE)?.value;
-  if (lastActivityStr) {
-    const lastActivity = parseInt(lastActivityStr, 10);
-    if (Date.now() - lastActivity > ADMIN_SESSION_TIMEOUT_MS) {
-      return {
-        authorized: false,
-        user: null,
-        errorResponse: { error: 'Unauthorized: Admin session timed out', status: 401 },
-      };
-    }
+  const sessionId = extractSessionIdFromCookies(cookieStore.getAll(), user.id);
+  const lastActivityCookie = cookieStore.get(ADMIN_LAST_ACTIVITY_COOKIE)?.value;
+
+  const activityCheck = verifySignedAdminCookieValue({
+    cookieValue: lastActivityCookie,
+    type: 'last_activity',
+    userId: user.id,
+    sessionId,
+    maxAgeMs: ADMIN_SESSION_TIMEOUT_MS,
+  });
+
+  if (!activityCheck.valid) {
+    return {
+      authorized: false,
+      user: null,
+      errorResponse: {
+        error: 'Unauthorized: Admin session timed out or invalid',
+        status: 401,
+      },
+    };
   }
 
   return { authorized: true, user };
@@ -163,15 +192,45 @@ export async function requireAdminApi(request?: Request): Promise<
 
 /**
  * Re-authentication check before sensitive operations (e.g. refunds, price changes).
- * Enforces that recent MFA verification occurred within the specified window.
+ * Enforces that recent MFA verification occurred within the specified window (default: 10 minutes).
+ * Validates HMAC-SHA256 signature bound to user.id and Supabase session.id.
  */
-export async function requireRecentAuth(maxMinutes = 10): Promise<boolean> {
-  const cookieStore = await cookies();
-  const lastVerifiedStr = cookieStore.get(ADMIN_MFA_VERIFIED_COOKIE)?.value;
-  if (!lastVerifiedStr) return false;
+export async function requireRecentAuth(
+  maxMinutes = 10,
+  context?: { userId?: string; sessionId?: string }
+): Promise<boolean> {
+  const supabase = await createClient();
+  let userId = context?.userId;
+  let sessionId = context?.sessionId;
 
-  const lastVerified = parseInt(lastVerifiedStr, 10);
-  return Date.now() - lastVerified <= maxMinutes * 60 * 1000;
+  if (!userId) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return false;
+    userId = user.id;
+
+    if (!sessionId) {
+      const cookieStore = await cookies();
+      sessionId = extractSessionIdFromCookies(cookieStore.getAll(), user.id);
+    }
+  }
+
+  if (!userId || !sessionId) return false;
+
+  const cookieStore = await cookies();
+  const rawCookie = cookieStore.get(ADMIN_MFA_VERIFIED_COOKIE)?.value;
+  if (!rawCookie) return false;
+
+  const result = verifySignedAdminCookieValue({
+    cookieValue: rawCookie,
+    type: 'mfa_verified',
+    userId,
+    sessionId,
+    maxAgeMs: maxMinutes * 60 * 1000,
+  });
+
+  return result.valid;
 }
 
 /**

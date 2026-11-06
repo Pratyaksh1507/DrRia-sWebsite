@@ -1,5 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
+import {
+  ADMIN_LAST_ACTIVITY_COOKIE,
+  ADMIN_SESSION_TIMEOUT_MS,
+  extractSessionIdFromCookies,
+  verifySignedAdminCookieValue,
+  setSignedAdminActivityCookie,
+} from '@/lib/admin-cookie';
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -23,23 +30,45 @@ export async function proxy(request: NextRequest) {
   }
 
   // Admin Area Protection
-  if (pathname.startsWith('/admin')) {
+  if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
     const isPublicAdminRoute =
-      pathname === '/admin/login' || pathname.startsWith('/admin/mfa');
+      pathname === '/admin/login' ||
+      pathname.startsWith('/admin/mfa') ||
+      pathname === '/api/admin/login' ||
+      pathname.startsWith('/api/admin/mfa');
 
     if (!isPublicAdminRoute && !user) {
+      if (pathname.startsWith('/api/admin')) {
+        return NextResponse.json(
+          { error: 'Unauthorized: Authentication required' },
+          { status: 401 }
+        );
+      }
       const loginUrl = new URL('/admin/login', request.url);
       return NextResponse.redirect(loginUrl);
     }
 
-    if (user) {
-      // Refresh 30-minute admin activity heartbeat cookie
-      response.cookies.set('drria_admin_last_activity', Date.now().toString(), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-      });
+    if (user && !isPublicAdminRoute) {
+      const sessionId = extractSessionIdFromCookies(request.cookies.getAll(), user.id);
+      const incomingActivity = request.cookies.get(ADMIN_LAST_ACTIVITY_COOKIE)?.value;
+
+      if (incomingActivity) {
+        const verifyResult = verifySignedAdminCookieValue({
+          cookieValue: incomingActivity,
+          type: 'last_activity',
+          userId: user.id,
+          sessionId,
+          maxAgeMs: ADMIN_SESSION_TIMEOUT_MS,
+        });
+
+        // Renew the signed activity timestamp ONLY after a valid authenticated admin request
+        if (verifyResult.valid) {
+          setSignedAdminActivityCookie(response, {
+            userId: user.id,
+            sessionId,
+          });
+        }
+      }
     }
   }
 

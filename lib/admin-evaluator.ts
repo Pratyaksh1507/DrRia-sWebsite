@@ -1,6 +1,10 @@
 export const ADMIN_SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
-export const ADMIN_LAST_ACTIVITY_COOKIE = 'drria_admin_last_activity';
-export const ADMIN_MFA_VERIFIED_COOKIE = 'drria_admin_mfa_verified_at';
+export {
+  ADMIN_LAST_ACTIVITY_COOKIE,
+  ADMIN_MFA_VERIFIED_COOKIE,
+  ACTIVITY_TIMEOUT_MAX_AGE_SEC,
+  MFA_VERIFIED_MAX_AGE_SEC,
+} from './admin-cookie.ts';
 
 export interface AdminAuthCheckResult {
   authorized: boolean;
@@ -26,6 +30,7 @@ export function evaluateAdminSession({
   nextAal,
   lastActivityTimestamp,
   currentTime = Date.now(),
+  activityCookieValid,
 }: {
   user: { id: string; email?: string } | null;
   isAdminUser: boolean;
@@ -33,6 +38,7 @@ export function evaluateAdminSession({
   nextAal?: 'aal1' | 'aal2';
   lastActivityTimestamp?: number | null;
   currentTime?: number;
+  activityCookieValid?: boolean;
 }): AdminAuthCheckResult {
   // 1. Signed-out user
   if (!user) {
@@ -75,7 +81,17 @@ export function evaluateAdminSession({
     };
   }
 
-  // 5. Inactive session timeout (30 minutes)
+  // 5. Inactive session timeout (30 minutes) or invalid activity state
+  if (activityCookieValid === false) {
+    return {
+      authorized: false,
+      status: 401,
+      reason: 'session_timeout',
+      redirectUrl: '/admin/login?error=session_timeout',
+      adminId: user.id,
+    };
+  }
+
   if (
     lastActivityTimestamp &&
     currentTime - lastActivityTimestamp > ADMIN_SESSION_TIMEOUT_MS

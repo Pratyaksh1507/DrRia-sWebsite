@@ -3,7 +3,12 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit } from '@/lib/rate-limit';
-import { logAdminAudit } from '@/lib/admin-auth';
+import {
+  logAdminAudit,
+  extractSessionId,
+  setSignedAdminActivityCookie,
+  setSignedAdminMfaVerifiedCookie,
+} from '@/lib/admin-auth';
 
 const mfaChallengeSchema = z
   .object({
@@ -126,22 +131,17 @@ export async function POST(request: Request) {
       redirect: '/admin',
     });
 
-    // Set secure activity and MFA verification cookies
-    const isProd = process.env.NODE_ENV === 'production';
-    const nowStr = Date.now().toString();
+    // Set signed activity and MFA verification cookies bound to user and session
+    const sessionId = extractSessionId(verifyData, user);
 
-    response.cookies.set('drria_admin_last_activity', nowStr, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: 'lax',
-      path: '/',
+    setSignedAdminActivityCookie(response, {
+      userId: user.id,
+      sessionId,
     });
 
-    response.cookies.set('drria_admin_mfa_verified_at', nowStr, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: 'lax',
-      path: '/',
+    setSignedAdminMfaVerifiedCookie(response, {
+      userId: user.id,
+      sessionId,
     });
 
     return response;
