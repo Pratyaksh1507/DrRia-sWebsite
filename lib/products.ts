@@ -2,6 +2,16 @@ import { createClient } from '@supabase/supabase-js';
 import { products as staticProducts } from '../data/products.ts';
 import type { Product, ProductImage } from '../data/products.ts';
 
+export class ProductQueryError extends Error {
+  readonly cause?: unknown;
+
+  constructor(message: string, cause?: unknown) {
+    super(message);
+    this.name = 'ProductQueryError';
+    this.cause = cause;
+  }
+}
+
 export interface DbProduct {
   id: string;
   slug: string;
@@ -22,6 +32,18 @@ export interface DbProduct {
   reviews_count: number;
   created_at: string;
   updated_at: string;
+  size?: string | null;
+  images?: ProductImage[] | string | null;
+  key_ingredients?: string[] | string | null;
+  benefits?: string[] | string | null;
+  full_ingredients?: string | null;
+  how_to_use?: string | null;
+  storage?: string | null;
+  caution?: string | null;
+  manufacturer_details?: string | null;
+  marketed_by?: string | null;
+  mfg_lic_no?: string | null;
+  badges?: string[] | string | null;
 }
 
 // Category design helpers matching brand guidelines
@@ -56,13 +78,32 @@ export function getCategoryAccent(category: string): string {
 }
 
 /**
- * Creates a public client for read-only catalogue queries.
+ * Checks whether Supabase is actively configured via environment variables.
+ */
+export function isSupabaseConfigured(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return Boolean(
+    url &&
+    !url.includes('placeholder') &&
+    url.trim().length > 0 &&
+    key &&
+    !key.includes('placeholder') &&
+    key.trim().length > 0
+  );
+}
+
+/**
+ * Creates a public client for read-only catalogue queries with RLS enforced.
  * Safe for static builds and server components.
  */
 function getPublicSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xhjkczndewkocqwsebry.supabase.co';
   const key =
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     'sb_publishable_NL2dn8xfvLegDdqugr_kWQ_vomnUcBT';
 
   return createClient(url, key, {
@@ -71,65 +112,87 @@ function getPublicSupabase() {
 }
 
 /**
- * Maps a database product row to the rich storefront Product interface.
- * Merges authoritative database pricing, inventory, tax, and status
- * with static layout assets (multi-angle responsive images, ingredients, directions).
+ * Privileged client used exclusively if includeUnpublished is requested in admin/test contexts.
  */
-export function mapDbProductToStorefront(
-  db: DbProduct,
-  staticMatch?: Product
-): Product {
-  const price = Number(db.price);
-  const mrp = Number(db.mrp);
-  const discountPercentage = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
-  const stockQuantity = Number(db.stock_quantity);
-  const inStock = stockQuantity > 0 && db.is_active;
+function getAdminSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const secretKey =
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (staticMatch) {
-    return {
-      ...staticMatch,
-      id: db.id,
-      slug: db.slug,
-      name: db.name || staticMatch.name,
-      tagline: db.tagline || staticMatch.tagline,
-      description: db.description || staticMatch.description,
-      price,
-      mrp,
-      discountPercentage,
-      stockQuantity,
-      inStock,
-      hsnCode: db.hsn_code,
-      taxRate: Number(db.tax_rate),
-      isActive: db.is_active,
-      badges: db.badge ? [db.badge, ...(staticMatch.badges?.slice(1) || [])] : staticMatch.badges,
-      images:
-        db.image_url && db.image_url !== staticMatch.images[0]?.src
-          ? [
-              {
-                src: db.image_url,
-                webpSrcSet: `${db.image_url} 768w`,
-                avifSrcSet: `${db.image_url} 768w`,
-                alt: db.name,
-                width: 768,
-                height: 768,
-                blurDataURL: staticMatch.images[0]?.blurDataURL || '',
-              },
-              ...staticMatch.images.slice(1),
-            ]
-          : staticMatch.images,
-    };
+  if (!url || !secretKey || secretKey.includes('placeholder')) {
+    return null;
   }
 
-  // Newly created product from admin with default storefront fallbacks
-  const primaryImage: ProductImage = {
-    src: db.image_url || '/images/hydroboost-moisturizer-lifestyle-768.webp',
-    webpSrcSet: `${db.image_url || '/images/hydroboost-moisturizer-lifestyle-768.webp'} 768w`,
-    avifSrcSet: `${db.image_url || '/images/hydroboost-moisturizer-lifestyle-768.webp'} 768w`,
-    alt: db.name,
-    width: 768,
-    height: 768,
-    blurDataURL: '',
-  };
+  return createClient(url, secretKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
+function parseJsonArray<T>(val: unknown, fallback: T[] = []): T[] {
+  if (!val) return fallback;
+  if (Array.isArray(val)) return val as T[];
+  if (typeof val === 'string') {
+    try {
+      const parsed = JSON.parse(val);
+      if (Array.isArray(parsed)) return parsed as T[];
+    } catch {}
+  }
+  return fallback;
+}
+
+/**
+ * Maps an authoritative database product row to the rich storefront Product interface.
+ * All product fields (images, ingredients, directions, compliance, size) are derived
+ * strictly from the database row.
+ */
+export function mapDbProductToStorefront(
+  db: DbProduct
+): Product {
+  const price = Number(db.price);
+  const mrp = db.mrp != null ? Number(db.mrp) : price;
+  const discountPercentage = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
+  const stockQuantity = Number(db.stock_quantity ?? 0);
+  const inStock = stockQuantity > 0 && Boolean(db.is_active);
+
+  // Parse images array from database row
+  let images = parseJsonArray<ProductImage>(db.images);
+  if (images.length === 0) {
+    if (db.image_url) {
+      images = [
+        {
+          src: db.image_url,
+          webpSrcSet: `${db.image_url} 768w`,
+          avifSrcSet: `${db.image_url} 768w`,
+          alt: db.name,
+          width: 768,
+          height: 768,
+          blurDataURL: '',
+        },
+      ];
+    } else {
+      images = [
+        {
+          src: '/images/hydroboost-moisturizer-lifestyle-768.webp',
+          webpSrcSet: '/images/hydroboost-moisturizer-lifestyle-768.webp 768w',
+          avifSrcSet: '/images/hydroboost-moisturizer-lifestyle-768.webp 768w',
+          alt: db.name,
+          width: 768,
+          height: 768,
+          blurDataURL: '',
+        },
+      ];
+    }
+  }
+
+  // Badges array
+  const badges = parseJsonArray<string>(db.badges);
+  if (badges.length === 0 && db.badge) {
+    badges.push(db.badge);
+  }
+
+  const keyIngredients = parseJsonArray<string>(db.key_ingredients);
+  const benefits = parseJsonArray<string>(db.benefits);
 
   return {
     id: db.id,
@@ -144,24 +207,27 @@ export function mapDbProductToStorefront(
     price,
     mrp,
     discountPercentage,
-    size: '',
-    images: [primaryImage],
+    size: db.size || '',
+    images,
     heroImageIndex: 0,
-    keyIngredients: [],
-    benefits: [],
-    fullIngredients: '',
-    howToUse: '',
+    keyIngredients,
+    benefits,
+    fullIngredients: db.full_ingredients || '',
+    howToUse: db.how_to_use || '',
+    storage: db.storage || undefined,
     complianceNote:
+      db.caution ||
       'Individual results may vary. For external use only. Do a patch test before first use.',
-    manufacturerDetails: 'Trassally International Pvt. Ltd.',
-    marketedBy: "Dr Ria's, 93-c Shastri Nagar, Jammu 180004",
-    badges: db.badge ? [db.badge] : [],
+    manufacturerDetails: db.manufacturer_details || 'Trassally International Pvt. Ltd.',
+    marketedBy: db.marketed_by || "Dr Ria's, 93-c Shastri Nagar, Jammu 180004",
+    mfgLicNo: db.mfg_lic_no || undefined,
+    badges,
     description: db.description || '',
     inStock,
     stockQuantity,
-    hsnCode: db.hsn_code,
-    taxRate: Number(db.tax_rate),
-    isActive: db.is_active,
+    hsnCode: db.hsn_code || '330499',
+    taxRate: Number(db.tax_rate ?? 18),
+    isActive: Boolean(db.is_active),
   };
 }
 
@@ -169,47 +235,23 @@ export function mapDbProductToStorefront(
  * Asynchronously loads all products from Supabase.
  * By default filters for is_active = true and deleted_at IS NULL (storefront view).
  * Admin callers can pass includeUnpublished: true to retrieve the complete inventory.
+ *
+ * When Supabase environment variables are configured, failures throw ProductQueryError (fail-closed).
+ * data/products.ts is used ONLY when Supabase credentials are completely absent.
  */
 export async function getAllProducts(options?: {
   includeUnpublished?: boolean;
 }): Promise<Product[]> {
-  try {
-    let rows: DbProduct[] = [];
-
-    // For admin callers requesting unpublished products, query database directly via PostgreSQL pool
-    let connStr = process.env.DATABASE_URL;
-    if (!connStr && typeof window === 'undefined') {
-      try {
-        const fs = await import('node:fs');
-        const path = await import('node:path');
-        const envPath = path.resolve(process.cwd(), '.env.local');
-        if (fs.existsSync(envPath)) {
-          const match = fs.readFileSync(envPath, 'utf8').match(/^DATABASE_URL=(.+)$/m);
-          if (match) connStr = match[1].trim();
+  if (isSupabaseConfigured()) {
+    try {
+      let supabase = getPublicSupabase();
+      if (options?.includeUnpublished) {
+        const adminClient = getAdminSupabaseClient();
+        if (adminClient) {
+          supabase = adminClient;
         }
-      } catch {}
-    }
-
-    if (options?.includeUnpublished && connStr) {
-      try {
-        const { default: pg } = await import('pg');
-        const pool = new pg.Pool({
-          connectionString: connStr,
-          ssl: { rejectUnauthorized: false },
-        });
-        const dbRes = await pool.query(
-          `SELECT * FROM public.products WHERE deleted_at IS NULL ORDER BY created_at ASC;`
-        );
-        await pool.end();
-        rows = dbRes.rows as DbProduct[];
-      } catch (poolErr) {
-        console.warn('[Admin DB Pool Fallback]', poolErr);
       }
-    }
 
-    // Storefront queries use the public client with RLS
-    if (rows.length === 0) {
-      const supabase = getPublicSupabase();
       let query = supabase.from('products').select('*').is('deleted_at', null);
 
       if (!options?.includeUnpublished) {
@@ -219,36 +261,46 @@ export async function getAllProducts(options?: {
       query = query.order('created_at', { ascending: true });
       const { data, error } = await query;
 
-      if (!error && data && data.length > 0) {
-        rows = data as DbProduct[];
+      if (error) {
+        console.error('[Product Fetch Error]', error.message);
+        throw new ProductQueryError(`Failed to fetch products from Supabase: ${error.message}`, error);
       }
-    }
 
-    if (rows.length === 0) {
-      // Graceful fallback to static products
-      return staticProducts
-        .filter((p) => (options?.includeUnpublished ? true : p.slug !== 'hair-growth-oil'))
-        .map((p) => ({
-          ...p,
-          isActive: p.slug !== 'hair-growth-oil',
-          inStock: p.slug !== 'hair-growth-oil',
-        }));
-    }
+      if (!data) {
+        return [];
+      }
 
-    const staticMap = new Map(staticProducts.map((p) => [p.slug, p]));
-    return rows.map((row) =>
-      mapDbProductToStorefront(row, staticMap.get(row.slug))
-    );
-  } catch (err) {
-    console.warn('[Product Fetch Fallback]', err);
-    return staticProducts
-      .filter((p) => (options?.includeUnpublished ? true : p.slug !== 'hair-growth-oil'))
-      .map((p) => ({
+      return (data as DbProduct[]).map((row) => mapDbProductToStorefront(row));
+    } catch (err) {
+      if (err instanceof ProductQueryError) {
+        throw err;
+      }
+      console.error('[Product Fetch Exception]', err instanceof Error ? err.message : err);
+      throw new ProductQueryError('Product catalogue service unavailable', err);
+    }
+  }
+
+  // Supabase environment variables are absent (local dev without .env / mock mode)
+  return staticProducts
+    .filter((p) => (options?.includeUnpublished ? true : p.slug !== 'hair-growth-oil'))
+    .map((p) => {
+      const price = p.price;
+      const mrp = p.mrp != null ? p.mrp : price;
+      const discountPercentage =
+        p.discountPercentage != null
+          ? p.discountPercentage
+          : mrp > price
+          ? Math.round(((mrp - price) / mrp) * 100)
+          : 0;
+
+      return {
         ...p,
+        mrp,
+        discountPercentage,
         isActive: p.slug !== 'hair-growth-oil',
         inStock: p.slug !== 'hair-growth-oil',
-      }));
-  }
+      };
+    });
 }
 
 /**
@@ -287,8 +339,10 @@ export async function getRelatedProducts(
 }
 
 /**
- * Synchronous validator for known catalog slugs (e.g. used by cart validation schemas).
+ * Synchronous validator for product slug format (lowercase letters, digits, hyphens, max 80 chars).
+ * No dependency on static catalogue data.
  */
 export function isValidProductSlug(slug: string): boolean {
-  return staticProducts.some((p) => p.slug === slug);
+  if (typeof slug !== 'string') return false;
+  return slug.length >= 1 && slug.length <= 80 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
 }

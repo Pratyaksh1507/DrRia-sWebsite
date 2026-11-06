@@ -7,6 +7,7 @@ import { checkRateLimit } from '@/lib/rate-limit';
 import {
   verifyRazorpayPaymentSignature,
   verifyPaymentCapturedAndAmount,
+  getRazorpayKeyId,
 } from '@/lib/payment-verify';
 
 const verifyPaymentSchema = z.object({
@@ -113,7 +114,7 @@ export async function POST(request: Request) {
       }
 
       // 6. Verify Payment Status, Amount, and Currency via Razorpay API
-      const rzpKeyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      const rzpKeyId = getRazorpayKeyId();
       if (!rzpKeyId) {
         return NextResponse.json(
           { error: 'Razorpay Key ID is not configured.' },

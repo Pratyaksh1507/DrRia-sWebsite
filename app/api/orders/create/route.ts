@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getProductBySlug } from '@/lib/products';
+import { getProductBySlug, ProductQueryError } from '@/lib/products';
+import { getRazorpayKeyId } from '@/lib/payment-verify';
+import { productSlugSchema } from '@/lib/cart-schema';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderConfirmationEmail } from '@/lib/email';
@@ -10,7 +12,7 @@ const createOrderSchema = z.object({
   items: z
     .array(
       z.object({
-        slug: z.string().min(1),
+        slug: productSlugSchema,
         quantity: z.number().int().min(1).max(20),
       })
     )
@@ -79,7 +81,7 @@ export async function POST(request: Request) {
           razorpayOrderId: existingOrder.razorpay_order_id,
           amount: existingOrder.total * 100,
           currency: 'INR',
-          keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+          keyId: getRazorpayKeyId() || 'rzp_test_placeholder',
           isCod: paymentMethod === 'cod',
         });
       }
@@ -123,7 +125,7 @@ export async function POST(request: Request) {
 
     if (paymentMethod === 'online') {
       razorpayOrderId = `order_${Math.random().toString(36).substring(2, 12)}`;
-      const rzpKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      const rzpKey = getRazorpayKeyId();
       const rzpSecret = process.env.RAZORPAY_KEY_SECRET;
 
       if (
@@ -204,11 +206,18 @@ export async function POST(request: Request) {
       razorpayOrderId,
       amount: total * 100,
       currency: 'INR',
-      keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+      keyId: getRazorpayKeyId() || 'rzp_test_placeholder',
       isCod: paymentMethod === 'cod',
     });
   } catch (error: unknown) {
-    console.error('[Order Creation Exception]', error);
+    if (error instanceof ProductQueryError) {
+      console.error('[Order Create] Product catalogue query failed:', error.message);
+      return NextResponse.json(
+        { error: 'Product catalogue is temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      );
+    }
+    console.error('[Order Creation Exception]', error instanceof Error ? error.message : error);
     const message = error instanceof Error ? error.message : 'Internal server error while creating order.';
     return NextResponse.json(
       { error: message },

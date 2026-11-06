@@ -10,21 +10,15 @@ import {
   verifyRazorpayWebhookSignature,
   verifyPaymentCapturedAndAmount,
   checkGatewaySecretConfig,
+  getRazorpayKeyId,
 } from '../lib/payment-verify.ts';
 
 import { InMemoryRateLimiter, checkRateLimit } from '../lib/rate-limit.ts';
 import { sanitizeNext } from '../lib/auth-helpers.ts';
 import { createUpdateCartSchema } from '../lib/cart-schema.ts';
 
-// Known catalogue slugs for cart schema testing
-const VALID_SLUGS = new Set([
-  'pure-rosemary-hair-oil',
-  'brightening-face-wash',
-  'anti-pigmentation-lip-balm',
-  'hydroboost-face-moisturizer',
-  'sun-defense-spf-50-sunscreen',
-]);
-const updateCartSchema = createUpdateCartSchema((slug) => VALID_SLUGS.has(slug));
+// Cart schema validating slug format only (Phase 2.5)
+const updateCartSchema = createUpdateCartSchema();
 
 // -----------------------------------------------------------------------------
 // SIMULATED DATABASE FOR CONCURRENCY & RETRY SAFETY TESTS
@@ -498,23 +492,36 @@ describe('Phase 0.5 Security Fixes & Hardening Tests', () => {
 
   // Test 8: Real Strict Cart Zod Schema Validation
   describe('8. Real Strict Cart Validation (lib/cart-schema.ts)', () => {
-    it('accepts valid catalogue item within limits', () => {
+    it('accepts valid slug format within limits', () => {
       const validPayload = {
         items: [
           { slug: 'anti-pigmentation-lip-balm', quantity: 2 },
           { slug: 'brightening-face-wash', quantity: 1 },
+          { slug: 'new-db-product-42', quantity: 3 },
         ],
       };
       const res = updateCartSchema.safeParse(validPayload);
       assert.strictEqual(res.success, true);
     });
 
-    it('rejects unlisted / malicious slug', () => {
-      const badPayload = {
-        items: [{ slug: 'non-existent-or-injected-slug', quantity: 1 }],
-      };
-      const res = updateCartSchema.safeParse(badPayload);
-      assert.strictEqual(res.success, false);
+    it('rejects invalid / malicious slug formats', () => {
+      const invalidSlugs = [
+        '../etc/passwd',
+        '<script>alert(1)</script>',
+        'INVALID_UPPERCASE_SLUG',
+        'slug with spaces',
+        'slug--double-dash',
+        '-leading-dash',
+        'trailing-dash-',
+        'a'.repeat(81),
+      ];
+      for (const badSlug of invalidSlugs) {
+        const badPayload = {
+          items: [{ slug: badSlug, quantity: 1 }],
+        };
+        const res = updateCartSchema.safeParse(badPayload);
+        assert.strictEqual(res.success, false, `Must reject slug format: ${badSlug}`);
+      }
     });
 
     it('rejects floating point quantity', () => {
@@ -559,6 +566,60 @@ describe('Phase 0.5 Security Fixes & Hardening Tests', () => {
       };
       const res = updateCartSchema.safeParse(badPayload);
       assert.strictEqual(res.success, false, 'Unknown keys must be rejected by .strict()');
+    });
+  });
+
+  // Test 8b: Razorpay Key Name Fallback & Precedence
+  describe('8b. Razorpay Key Name Precedence (getRazorpayKeyId)', () => {
+    const origKey = process.env.RAZORPAY_KEY_ID;
+    const origPubKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+
+    const restore = () => {
+      if (origKey !== undefined) process.env.RAZORPAY_KEY_ID = origKey;
+      else delete process.env.RAZORPAY_KEY_ID;
+
+      if (origPubKey !== undefined) process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID = origPubKey;
+      else delete process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    };
+
+    it('resolves when only RAZORPAY_KEY_ID is set', () => {
+      try {
+        delete process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+        process.env.RAZORPAY_KEY_ID = 'rzp_live_server_only';
+        assert.strictEqual(getRazorpayKeyId(), 'rzp_live_server_only');
+      } finally {
+        restore();
+      }
+    });
+
+    it('resolves when only NEXT_PUBLIC_RAZORPAY_KEY_ID is set', () => {
+      try {
+        delete process.env.RAZORPAY_KEY_ID;
+        process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID = 'rzp_live_public_only';
+        assert.strictEqual(getRazorpayKeyId(), 'rzp_live_public_only');
+      } finally {
+        restore();
+      }
+    });
+
+    it('prioritizes RAZORPAY_KEY_ID when both are set', () => {
+      try {
+        process.env.RAZORPAY_KEY_ID = 'rzp_live_primary';
+        process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID = 'rzp_live_secondary';
+        assert.strictEqual(getRazorpayKeyId(), 'rzp_live_primary');
+      } finally {
+        restore();
+      }
+    });
+
+    it('returns undefined when neither is set', () => {
+      try {
+        delete process.env.RAZORPAY_KEY_ID;
+        delete process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+        assert.strictEqual(getRazorpayKeyId(), undefined);
+      } finally {
+        restore();
+      }
     });
   });
 

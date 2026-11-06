@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getRazorpayKeyId } from '@/lib/payment-verify';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -36,7 +37,7 @@ export async function GET(request: Request) {
   const emailPresent = isPresent(process.env.EMAIL_PROVIDER_API_KEY) ||
     isPresent(process.env.RESEND_API_KEY);
 
-  const razorpayKeyPresent = isPresent(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
+  const razorpayKeyPresent = isPresent(getRazorpayKeyId());
   const razorpaySecretPresent = isPresent(process.env.RAZORPAY_KEY_SECRET);
 
   const services = {

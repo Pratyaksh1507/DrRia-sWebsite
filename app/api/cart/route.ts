@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getProductBySlug, isValidProductSlug } from '@/lib/products';
+import { getProductBySlug, ProductQueryError } from '@/lib/products';
 import { createUpdateCartSchema } from '@/lib/cart-schema';
 
-// Strict Zod schema for cart mutations
-export const updateCartSchema = createUpdateCartSchema(
-  (slug) => isValidProductSlug(slug)
-);
+// Strict Zod schema for cart mutations (validates slug format only; existence checked in handlers)
+export const updateCartSchema = createUpdateCartSchema();
 
 interface RawCartItem {
   slug?: string;
@@ -76,6 +74,13 @@ export async function GET() {
       droppedCount,
     });
   } catch (err: unknown) {
+    if (err instanceof ProductQueryError) {
+      console.error('[Cart GET] Product catalogue query failed:', err.message);
+      return NextResponse.json(
+        { error: 'Product catalogue is temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      );
+    }
     console.error('[Cart GET Exception]', err);
     return NextResponse.json({ items: [], droppedCount: 0 });
   }
@@ -133,6 +138,13 @@ export async function PUT(request: Request) {
 
     return NextResponse.json({ success: true, count: cleanItems.length });
   } catch (err: unknown) {
+    if (err instanceof ProductQueryError) {
+      console.error('[Cart PUT] Product catalogue query failed:', err.message);
+      return NextResponse.json(
+        { error: 'Product catalogue is temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      );
+    }
     console.error('[Cart PUT Exception]', err);
     const message = err instanceof Error ? err.message : 'Failed to save cart';
     return NextResponse.json(

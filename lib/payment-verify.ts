@@ -1,5 +1,13 @@
 import crypto from 'crypto';
 
+/**
+ * Resolves the Razorpay Key ID with fallback precedence:
+ * RAZORPAY_KEY_ID || NEXT_PUBLIC_RAZORPAY_KEY_ID
+ */
+export function getRazorpayKeyId(): string | undefined {
+  return process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+}
+
 export interface VerifyPaymentSignatureParams {
   orderId: string;
   paymentId: string;

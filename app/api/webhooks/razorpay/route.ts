@@ -5,6 +5,7 @@ import { sendOrderConfirmationEmail } from '@/lib/email';
 import {
   verifyRazorpayWebhookSignature,
   verifyPaymentCapturedAndAmount,
+  getRazorpayKeyId,
 } from '@/lib/payment-verify';
 
 interface RazorpayWebhookPayload {
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
     const rawBody = await request.text();
     const signature = request.headers.get('x-razorpay-signature');
     const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    const rzpKeyId = getRazorpayKeyId();
 
     const isProduction = process.env.NODE_ENV === 'production';
     const isPlaceholderSecret = !webhookSecret || webhookSecret.includes('placeholder');
@@ -51,7 +53,9 @@ export async function POST(request: Request) {
           { status: 503 }
         );
       }
-      console.warn('[Webhook Warning] RAZORPAY_WEBHOOK_SECRET is unset; running in development mode.');
+      console.warn(
+        `[Webhook Warning] RAZORPAY_WEBHOOK_SECRET is unset; running in development mode (keyId: ${rzpKeyId || 'unset'}).`
+      );
     } else {
       if (!signature) {
         return NextResponse.json({ error: 'Missing webhook signature' }, { status: 400 });

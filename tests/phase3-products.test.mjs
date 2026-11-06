@@ -3,7 +3,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import pg from 'pg';
-import { getAllProducts, getProductBySlug, isValidProductSlug } from '../lib/products.ts';
+import {
+  getAllProducts,
+  getProductBySlug,
+  isValidProductSlug,
+  mapDbProductToStorefront,
+  ProductQueryError,
+} from '../lib/products.ts';
+import { createUpdateCartSchema } from '../lib/cart-schema.ts';
 
 import fs from 'node:fs';
 
@@ -258,6 +265,177 @@ describe('Phase 3: Product Catalogue & Dynamic Storefront Integration', () => {
         sql.includes('insert into public.audit_logs'),
         'Must log admin provisioning to audit_logs'
       );
+    });
+  });
+
+  describe('7. Database-Only Product Support & Zero Static Dependency (Phase 2.5)', () => {
+    const dbOnlyProductRow = {
+      id: 'e1000000-0000-0000-0000-000000000099',
+      slug: 'peptide-barrier-repair-serum',
+      name: 'Peptide Barrier Repair Serum',
+      category: 'skin',
+      tagline: 'Multi-peptide cellular restoration',
+      description: 'Advanced peptide and ceramide complex formulated for barrier recovery.',
+      price: 549,
+      mrp: 799,
+      stock_quantity: 45,
+      hsn_code: '330499',
+      tax_rate: 18,
+      is_active: true,
+      deleted_at: null,
+      badge: 'Peptide Active',
+      image_url: '/images/products/peptide-serum.webp',
+      rating: 4.9,
+      reviews_count: 12,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      size: '30 ml / 1.01 fl oz',
+      images: [
+        {
+          src: '/images/products/peptide-serum-front.webp',
+          webpSrcSet: '/images/products/peptide-serum-front.webp 768w',
+          avifSrcSet: '/images/products/peptide-serum-front.webp 768w',
+          alt: 'Peptide Barrier Repair Serum bottle front view',
+          width: 768,
+          height: 768,
+          blurDataURL: '',
+        },
+      ],
+      key_ingredients: ['Copper Tripeptide-1', 'Matrixyl 3000', 'Ceramide NP', 'Hyaluronic Acid'],
+      benefits: ['Restores skin barrier', 'Smooths fine lines', 'Deep cellular hydration'],
+      full_ingredients: 'Aqua, Glycerin, Butylene Glycol, Copper Tripeptide-1, Palmitoyl Tripeptide-1, Palmitoyl Tetrapeptide-7, Ceramide NP, Sodium Hyaluronate, Phenoxyethanol.',
+      how_to_use: 'Apply 3-4 drops morning and evening to cleansed skin before moisturizer.',
+      storage: 'Store in a cool dry place away from direct sunlight.',
+      caution: 'For external use only. Perform a patch test before first use.',
+      manufacturer_details: 'Trassally International Pvt. Ltd.',
+      marketed_by: "Dr Ria's, 93-c Shastri Nagar, Jammu 180004",
+      mfg_lic_no: 'COS8UP2026999999',
+      badges: ['Peptide Active', 'Barrier Repair', 'Dermatologist Tested'],
+    };
+
+    test('mapDbProductToStorefront fully renders database-only product without static fallback', () => {
+      const rendered = mapDbProductToStorefront(dbOnlyProductRow);
+
+      assert.equal(rendered.id, dbOnlyProductRow.id);
+      assert.equal(rendered.slug, 'peptide-barrier-repair-serum');
+      assert.equal(rendered.name, 'Peptide Barrier Repair Serum');
+      assert.equal(rendered.price, 549);
+      assert.equal(rendered.mrp, 799);
+      assert.equal(rendered.discountPercentage, 31);
+      assert.equal(rendered.size, '30 ml / 1.01 fl oz');
+      assert.equal(rendered.images.length, 1);
+      assert.equal(rendered.images[0].src, '/images/products/peptide-serum-front.webp');
+      assert.deepEqual(rendered.keyIngredients, [
+        'Copper Tripeptide-1',
+        'Matrixyl 3000',
+        'Ceramide NP',
+        'Hyaluronic Acid',
+      ]);
+      assert.deepEqual(rendered.benefits, [
+        'Restores skin barrier',
+        'Smooths fine lines',
+        'Deep cellular hydration',
+      ]);
+      assert.equal(rendered.fullIngredients, dbOnlyProductRow.full_ingredients);
+      assert.equal(rendered.howToUse, dbOnlyProductRow.how_to_use);
+      assert.equal(rendered.complianceNote, dbOnlyProductRow.caution);
+      assert.equal(rendered.inStock, true);
+      assert.equal(rendered.stockQuantity, 45);
+      assert.deepEqual(rendered.badges, ['Peptide Active', 'Barrier Repair', 'Dermatologist Tested']);
+    });
+
+    test('isValidProductSlug validates database-only product slug format without static data', () => {
+      assert.equal(isValidProductSlug('peptide-barrier-repair-serum'), true);
+      assert.equal(isValidProductSlug('any-new-custom-product-2026'), true);
+      assert.equal(isValidProductSlug('INVALID_UPPERCASE'), false);
+      assert.equal(isValidProductSlug('bad slug with spaces'), false);
+      assert.equal(isValidProductSlug('-leading-dash'), false);
+    });
+
+    test('database-only product can be validated in cart schema and ordered', () => {
+      const cartSchema = createUpdateCartSchema();
+      const cartPayload = {
+        items: [{ slug: 'peptide-barrier-repair-serum', quantity: 2 }],
+      };
+
+      const parseResult = cartSchema.safeParse(cartPayload);
+      assert.equal(parseResult.success, true, 'Cart schema accepts database-only product');
+
+      // Server-side order price calculation
+      const rendered = mapDbProductToStorefront(dbOnlyProductRow);
+      const orderSubtotal = rendered.price * cartPayload.items[0].quantity;
+      assert.equal(orderSubtotal, 549 * 2, 'Server calculates order total directly from database row');
+    });
+
+    test('live database transaction supports inserting and querying a database-only product', async () => {
+      const pool = new pg.Pool({
+        connectionString,
+        ssl: { rejectUnauthorized: false },
+      });
+
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+
+        // Insert database-only product
+        await client.query(
+          `INSERT INTO public.products (
+            id, slug, name, category, tagline, description, price, mrp, stock_quantity,
+            hsn_code, tax_rate, is_active, size, images, key_ingredients, benefits,
+            full_ingredients, how_to_use, storage, caution, manufacturer_details, marketed_by,
+            mfg_lic_no, badges
+          ) VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24
+          );`,
+          [
+            dbOnlyProductRow.id,
+            dbOnlyProductRow.slug,
+            dbOnlyProductRow.name,
+            dbOnlyProductRow.category,
+            dbOnlyProductRow.tagline,
+            dbOnlyProductRow.description,
+            dbOnlyProductRow.price,
+            dbOnlyProductRow.mrp,
+            dbOnlyProductRow.stock_quantity,
+            dbOnlyProductRow.hsn_code,
+            dbOnlyProductRow.tax_rate,
+            dbOnlyProductRow.is_active,
+            dbOnlyProductRow.size,
+            JSON.stringify(dbOnlyProductRow.images),
+            JSON.stringify(dbOnlyProductRow.key_ingredients),
+            JSON.stringify(dbOnlyProductRow.benefits),
+            dbOnlyProductRow.full_ingredients,
+            dbOnlyProductRow.how_to_use,
+            dbOnlyProductRow.storage,
+            dbOnlyProductRow.caution,
+            dbOnlyProductRow.manufacturer_details,
+            dbOnlyProductRow.marketed_by,
+            dbOnlyProductRow.mfg_lic_no,
+            JSON.stringify(dbOnlyProductRow.badges),
+          ]
+        );
+
+        // Query the product back
+        const result = await client.query(
+          `SELECT * FROM public.products WHERE slug = $1;`,
+          [dbOnlyProductRow.slug]
+        );
+
+        assert.equal(result.rows.length, 1);
+        const row = result.rows[0];
+        const storefrontProduct = mapDbProductToStorefront(row);
+
+        assert.equal(storefrontProduct.slug, 'peptide-barrier-repair-serum');
+        assert.equal(storefrontProduct.price, 549);
+        assert.equal(storefrontProduct.size, '30 ml / 1.01 fl oz');
+        assert.equal(storefrontProduct.keyIngredients.length, 4);
+        assert.equal(storefrontProduct.benefits.length, 3);
+        assert.equal(storefrontProduct.inStock, true);
+      } finally {
+        await client.query('ROLLBACK');
+        client.release();
+        await pool.end();
+      }
     });
   });
 });

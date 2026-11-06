@@ -1,4 +1,6 @@
 import 'server-only';
+import fs from 'node:fs';
+import path from 'node:path';
 import pg from 'pg';
 
 const { Pool } = pg;
@@ -10,8 +12,6 @@ export function getDbPool(): pg.Pool {
     let connectionString = process.env.DATABASE_URL;
     if (!connectionString && typeof window === 'undefined') {
       try {
-        const fs = require('node:fs');
-        const path = require('node:path');
         const envPath = path.resolve(process.cwd(), '.env.local');
         if (fs.existsSync(envPath)) {
           const match = fs.readFileSync(envPath, 'utf8').match(/^DATABASE_URL=(.+)$/m);
@@ -26,7 +26,7 @@ export function getDbPool(): pg.Pool {
     pool = new Pool({
       connectionString,
       ssl: { rejectUnauthorized: false },
-      max: 10,
+      max: 2,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000,
     });
@@ -34,9 +34,9 @@ export function getDbPool(): pg.Pool {
   return pool;
 }
 
-export async function queryDb<T extends pg.QueryResultRow = any>(
+export async function queryDb<T extends pg.QueryResultRow = pg.QueryResultRow>(
   text: string,
-  params?: any[]
+  params?: unknown[]
 ): Promise<pg.QueryResult<T>> {
   const p = getDbPool();
   return p.query<T>(text, params);
