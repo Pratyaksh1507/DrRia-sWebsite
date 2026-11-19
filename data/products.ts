@@ -38,6 +38,8 @@ export interface Product {
   hsnCode?: string;
   taxRate?: number;
   isActive?: boolean;
+  rating?: number;
+  reviewsCount?: number;
 }
 
 export const products: Product[] = [

@@ -228,6 +228,8 @@ export function mapDbProductToStorefront(
     hsnCode: db.hsn_code || '330499',
     taxRate: Number(db.tax_rate ?? 18),
     isActive: Boolean(db.is_active),
+    rating: db.rating != null ? Number(db.rating) : 5.0,
+    reviewsCount: Number(db.reviews_count ?? 0),
   };
 }
 

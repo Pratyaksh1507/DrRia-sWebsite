@@ -6,6 +6,7 @@ import type { Product } from '@/data/products';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductAccordions from '@/components/product/ProductAccordions';
+import ProductReviewsSection from '@/components/product/ProductReviewsSection';
 import ProductSchema from '@/components/product/ProductSchema';
 import ProductCard from '@/components/ui/ProductCard';
 import { getSiteUrl } from '@/lib/site-url';
@@ -153,6 +154,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <p className="mt-2 text-sm sm:text-base text-[#5C3D1E] font-medium">
                   {product.tagline}
                 </p>
+
+                {/* Rating & Review Jump Anchor */}
+                <div className="mt-2.5 flex items-center gap-2 text-xs">
+                  <a
+                    href="#reviews"
+                    className="inline-flex items-center gap-1.5 text-[#5C3D1E] hover:underline font-medium"
+                    aria-label={`Rated ${product.rating || 5.0} out of 5 stars based on ${product.reviewsCount || 0} reviews. Click to view customer reviews.`}
+                  >
+                    <span className="font-bold text-[#1A1A1A]">{product.rating || 5.0}</span>
+                    <svg className="w-3.5 h-3.5 text-[#C9952A] fill-current" viewBox="0 0 20 20" aria-hidden="true">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span className="text-[#6B6B6B]">
+                      ({product.reviewsCount || 0} {product.reviewsCount === 1 ? 'review' : 'reviews'})
+                    </span>
+                  </a>
+                </div>
               </div>
 
               {/* Price Row (Rendered in Server HTML for crawlers and shopping agents) */}
@@ -208,6 +226,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
             </div>
           </div>
+
+          {/* Customer Reviews Section */}
+          <ProductReviewsSection
+            productSlug={product.slug}
+            productName={product.name}
+            initialRating={product.rating}
+            initialReviewsCount={product.reviewsCount}
+          />
 
           {/* Related Formulations */}
           {related.length > 0 && (

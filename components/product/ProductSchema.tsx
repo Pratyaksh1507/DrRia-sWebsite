@@ -14,6 +14,17 @@ export default function ProductSchema({ product }: { product: Product }) {
       name: "Dr Ria's",
     },
     sku: product.id,
+    ...(product.reviewsCount && product.reviewsCount > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: (product.rating || 5.0).toString(),
+            reviewCount: product.reviewsCount.toString(),
+            bestRating: '5',
+            worstRating: '1',
+          },
+        }
+      : {}),
     offers: {
       '@type': 'Offer',
       url: `${baseUrl}/products/${product.slug}`,
