@@ -146,9 +146,8 @@ export async function PUT(request: Request) {
       );
     }
     console.error('[Cart PUT Exception]', err);
-    const message = err instanceof Error ? err.message : 'Failed to save cart';
     return NextResponse.json(
-      { error: message },
+      { error: 'Failed to save cart. Please try again later.' },
       { status: 500 }
     );
   }
@@ -171,9 +170,8 @@ export async function DELETE() {
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
     console.error('[Cart DELETE Exception]', err);
-    const message = err instanceof Error ? err.message : 'Failed to clear cart';
     return NextResponse.json(
-      { error: message },
+      { error: 'Failed to clear cart. Please try again later.' },
       { status: 500 }
     );
   }

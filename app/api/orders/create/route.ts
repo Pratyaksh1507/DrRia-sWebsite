@@ -322,9 +322,8 @@ export async function POST(request: Request) {
       );
     }
     console.error('[Order Creation Exception]', error instanceof Error ? error.message : error);
-    const message = error instanceof Error ? error.message : 'Internal server error while creating order.';
     return NextResponse.json(
-      { error: message },
+      { error: 'Failed to create order. Please try again later.' },
       { status: 500 }
     );
   }

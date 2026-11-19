@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/client';
 import { useCartStore, saveCartBeforeOAuth } from '@/lib/cart';
+import { sanitizeNext } from '@/lib/auth-helpers';
 import OtpInput from './OtpInput';
 
 const emailSchema = z.string().email('Please enter a valid email address');
@@ -14,7 +15,7 @@ const phoneSchema = z.string().regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-di
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextUrl = searchParams.get('next') || '/account';
+  const nextUrl = sanitizeNext(searchParams.get('next'));
 
   const [authMode, setAuthMode] = useState<'email' | 'phone'>('email');
   const [step, setStep] = useState<'request' | 'verify'>('request');

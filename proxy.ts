@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
+import { sanitizeNext } from '@/lib/auth-helpers';
 import {
   ADMIN_LAST_ACTIVITY_COOKIE,
   ADMIN_SESSION_TIMEOUT_MS,
@@ -75,7 +76,7 @@ export async function proxy(request: NextRequest) {
   // If already authenticated and visits /login, redirect to next or /account
   if (pathname === '/login' && user) {
     const nextParam = request.nextUrl.searchParams.get('next');
-    const target = nextParam && nextParam.startsWith('/') ? nextParam : '/account';
+    const target = sanitizeNext(nextParam);
     return NextResponse.redirect(new URL(target, request.url));
   }
 
