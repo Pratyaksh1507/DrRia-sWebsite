@@ -6,11 +6,17 @@ import FAQ from '@/components/home/FAQ';
 import Newsletter from '@/components/home/Newsletter';
 import ProductCard from '@/components/ui/ProductCard';
 import { getAllProducts } from '@/lib/products';
+import type { Product } from '@/data/products';
 import Link from 'next/link';
 
 export default async function Home() {
   'use cache';
-  const allProducts = await getAllProducts();
+  let allProducts: Product[] = [];
+  try {
+    allProducts = await getAllProducts();
+  } catch (err) {
+    console.warn('[HomePage] Could not query live products from database:', err);
+  }
 
   return (
     <>

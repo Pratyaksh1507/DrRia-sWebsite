@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderConfirmationEmail } from '@/lib/email';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { decrementProductStock } from '@/lib/inventory';
 import {
   verifyRazorpayPaymentSignature,
   verifyPaymentCapturedAndAmount,
@@ -171,10 +172,24 @@ export async function POST(request: Request) {
       throw updateError;
     }
 
-    // 8. Only if a row is returned: clear the cart and send the confirmation email.
+    // 8. Only if a row is returned: clear the cart, decrement stock, and send the confirmation email.
     if (updatedOrders && updatedOrders.length > 0) {
       // Clear Server-Side Cart for User
       await adminSupabase.from('carts').delete().eq('user_id', user.id);
+
+      // Decrement Inventory Stock
+      try {
+        const orderItems = (order.order_items || []) as Array<{ product_slug?: string; quantity?: number }>;
+        const itemsToDecrement = orderItems
+          .filter((i) => i.product_slug && i.quantity)
+          .map((i) => ({ slug: i.product_slug!, quantity: i.quantity! }));
+
+        if (itemsToDecrement.length > 0) {
+          await decrementProductStock(itemsToDecrement);
+        }
+      } catch (stockErr) {
+        console.warn('[Verify Stock Decrement Warning]', stockErr);
+      }
 
       // Send Order Confirmation Email Asynchronously
       if (user.email) {

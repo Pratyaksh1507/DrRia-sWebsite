@@ -280,6 +280,13 @@ export async function getAllProducts(options?: {
     }
   }
 
+  // In production, missing Supabase credentials must fail closed — NEVER fall back to static data
+  if (process.env.NODE_ENV === 'production') {
+    throw new ProductQueryError(
+      'Product database configuration is missing in production environment.'
+    );
+  }
+
   // Supabase environment variables are absent (local dev without .env / mock mode)
   return staticProducts
     .filter((p) => (options?.includeUnpublished ? true : p.slug !== 'hair-growth-oil'))

@@ -4,7 +4,12 @@ import { getSiteUrl } from '@/lib/site-url';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getSiteUrl();
-  const products = await getAllProducts();
+  let products: Awaited<ReturnType<typeof getAllProducts>> = [];
+  try {
+    products = await getAllProducts();
+  } catch (err) {
+    console.warn('[sitemap] Could not query live products for sitemap:', err);
+  }
   const buildDate = '2026-11-02';
 
   const productEntries: MetadataRoute.Sitemap = products.map((product) => ({

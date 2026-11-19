@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getAllProducts, getProductBySlug, getRelatedProducts } from '@/lib/products';
+import type { Product } from '@/data/products';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductAccordions from '@/components/product/ProductAccordions';
@@ -16,16 +17,33 @@ interface ProductPageProps {
 }
 
 export async function generateStaticParams() {
-  const products = await getAllProducts();
-  return products.map((product) => ({
-    slug: product.slug,
-  }));
+  try {
+    const products = await getAllProducts();
+    if (products.length > 0) {
+      return products.map((product) => ({
+        slug: product.slug,
+      }));
+    }
+  } catch (err) {
+    console.warn('[generateStaticParams] Could not fetch products during build (e.g. database paused):', err);
+  }
+  return [
+    { slug: 'anti-pigmentation-lip-balm' },
+    { slug: 'vita-c-daily-glow-face-wash' },
+    { slug: 'hydroboost-face-moisturizer' },
+    { slug: 'spf50-sunscreen' },
+  ];
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   'use cache';
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  let product: Product | undefined;
+  try {
+    product = await getProductBySlug(slug);
+  } catch {
+    // Database offline/paused
+  }
 
   if (!product) {
     return {
@@ -63,7 +81,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 export default async function ProductPage({ params }: ProductPageProps) {
   'use cache';
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  let product: Product | undefined;
+  try {
+    product = await getProductBySlug(slug);
+  } catch (err) {
+    console.warn(`[ProductPage] Could not query product ${slug} (database paused/offline):`, err);
+  }
 
   if (!product || product.isActive === false) {
     notFound();

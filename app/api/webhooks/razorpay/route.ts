@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendOrderConfirmationEmail } from '@/lib/email';
+import { decrementProductStock } from '@/lib/inventory';
 import {
   verifyRazorpayWebhookSignature,
   verifyPaymentCapturedAndAmount,
@@ -233,6 +234,20 @@ export async function POST(request: Request) {
         // Clear server cart for user
         if (storedOrder.user_id) {
           await adminSupabase.from('carts').delete().eq('user_id', storedOrder.user_id);
+        }
+
+        // Decrement product inventory
+        try {
+          const orderItems = (storedOrder.order_items || []) as Array<{ product_slug?: string; quantity?: number }>;
+          const itemsToDecrement = orderItems
+            .filter((i) => i.product_slug && i.quantity)
+            .map((i) => ({ slug: i.product_slug!, quantity: i.quantity! }));
+
+          if (itemsToDecrement.length > 0) {
+            await decrementProductStock(itemsToDecrement);
+          }
+        } catch (stockErr) {
+          console.warn('[Webhook Stock Decrement Warning]', stockErr);
         }
 
         // Send confirmation email

@@ -4,6 +4,14 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
+interface CustomerOrderItem {
+  id?: string;
+  product_slug: string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+}
+
 interface OrderDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -72,6 +80,8 @@ async function OrderDetailContent({ params }: OrderDetailPageProps) {
     switch (status) {
       case 'paid':
         return 'bg-[#EDF6EE] text-[#3A7D44] border-[#C5E5C9]';
+      case 'processing':
+        return 'bg-[#F0F4FF] text-[#3B82F6] border-[#BFDBFE]';
       case 'shipped':
         return 'bg-[#EBF3F8] text-[#244E6E] border-[#C5DCEB]';
       case 'delivered':
@@ -85,6 +95,26 @@ async function OrderDetailContent({ params }: OrderDetailPageProps) {
 
   const address = order.address_snapshot || {};
   const items = order.order_items || [];
+
+  // Determine shipment timeline progress
+  const timelineSteps = [
+    { key: 'placed', label: 'Order Placed', done: true },
+    {
+      key: 'processing',
+      label: 'Packed & Ready',
+      done: ['processing', 'shipped', 'delivered'].includes(order.status),
+    },
+    {
+      key: 'shipped',
+      label: 'In Transit',
+      done: ['shipped', 'delivered'].includes(order.status),
+    },
+    {
+      key: 'delivered',
+      label: 'Delivered',
+      done: order.status === 'delivered',
+    },
+  ];
 
   const whatsAppText = encodeURIComponent(
     `Hello Dr Ria's! I am inquiring about my order #${order.id}.\n` +
@@ -146,6 +176,99 @@ async function OrderDetailContent({ params }: OrderDetailPageProps) {
         </div>
       </div>
 
+      {/* Live Shipment & Tracking Card (If fulfilled or in transit) */}
+      {order.status !== 'cancelled' && (
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E8E0D5] shadow-xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[#F3EBDD]">
+            <div>
+              <span className="text-xs font-semibold tracking-widest uppercase text-[#C9952A]">
+                Delivery Tracking
+              </span>
+              <h2 className="font-serif text-xl font-bold text-[#3E2914]">
+                {order.status === 'delivered'
+                  ? 'Package Delivered'
+                  : order.status === 'shipped'
+                  ? 'Package On The Way'
+                  : 'Preparing Your Formulations'}
+              </h2>
+            </div>
+            {order.awb_number && (
+              <div className="text-left sm:text-right">
+                <span className="text-[11px] text-[#6B6B6B] block">Courier & Waybill</span>
+                <span className="font-mono text-xs font-bold text-[#244E6E]">
+                  {order.courier_name ? `${order.courier_name}: ` : ''}
+                  {order.awb_number}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Stepper Timeline */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+            {timelineSteps.map((step, idx) => (
+              <div key={step.key} className="flex flex-col items-start gap-2">
+                <div className="flex items-center gap-2 w-full">
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                      step.done
+                        ? 'bg-[#3A7D44] text-white'
+                        : 'bg-[#FAF5EA] border border-[#E8E0D5] text-[#A39281]'
+                    }`}
+                  >
+                    {step.done ? '✓' : idx + 1}
+                  </div>
+                  <div
+                    className={`h-1 flex-1 rounded-full ${
+                      step.done ? 'bg-[#3A7D44]' : 'bg-[#E8E0D5]/50'
+                    }`}
+                  />
+                </div>
+                <span
+                  className={`text-xs font-semibold ${
+                    step.done ? 'text-[#3E2914]' : 'text-[#A39281]'
+                  }`}
+                >
+                  {step.label}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Action button if tracking URL or AWB is present */}
+          {(order.tracking_url || order.awb_number) && (
+            <div className="pt-4 border-t border-[#F3EBDD] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF5EA]/50 p-4 rounded-2xl border border-[#E8E0D5]">
+              <div className="text-xs text-[#5C3D1E]">
+                <p className="font-semibold">Live Courier Dispatch Tracking</p>
+                <p className="text-[11px] text-[#6B6B6B]">
+                  Check live location, route stops, and expected delivery time with{' '}
+                  {order.courier_name || 'the delivery service'}.
+                </p>
+              </div>
+              <a
+                href={
+                  order.tracking_url ||
+                  (order.courier_name === 'Delhivery'
+                    ? `https://www.delhivery.com/track/package/${order.awb_number}`
+                    : order.courier_name === 'Blue Dart'
+                    ? `https://www.bluedart.com/tracking?trackNumber=${order.awb_number}`
+                    : `https://www.google.com/search?q=${encodeURIComponent(
+                        `${order.courier_name || 'courier'} tracking ${order.awb_number}`
+                      )}`)
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#5C3D1E] text-white text-xs font-semibold hover:bg-[#7A532B] transition-colors shrink-0"
+              >
+                <span>Track Package</span>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Order Items List */}
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E8E0D5] shadow-xs space-y-6">
         <h2 className="font-serif text-xl font-bold text-[#3E2914] pb-3 border-b border-[#F3EBDD]">
@@ -153,7 +276,7 @@ async function OrderDetailContent({ params }: OrderDetailPageProps) {
         </h2>
 
         <div className="divide-y divide-[#F3EBDD]">
-          {items.map((item: any) => (
+          {items.map((item: CustomerOrderItem) => (
             <div
               key={item.id || item.product_slug}
               className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"

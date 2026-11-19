@@ -32,11 +32,11 @@ export default function AdminSidebarNav() {
     },
     {
       name: 'Orders',
-      href: '#',
-      active: false,
-      comingSoon: true,
+      href: '/admin/orders',
+      active: pathname.startsWith('/admin/orders'),
+      comingSoon: false,
       icon: (
-        <svg className="w-4 h-4 text-[#5C3D1E]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="w-4 h-4 text-[#C9952A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
       ),

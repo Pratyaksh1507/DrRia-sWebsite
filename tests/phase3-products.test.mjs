@@ -14,12 +14,10 @@ import { createUpdateCartSchema } from '../lib/cart-schema.ts';
 
 import fs from 'node:fs';
 
-let connectionString = process.env.DATABASE_URL || '';
-if (!connectionString && fs.existsSync('.env.local')) {
-  const envContent = fs.readFileSync('.env.local', 'utf8');
-  const match = envContent.match(/DATABASE_URL=(.+)/);
-  if (match) connectionString = match[1].trim();
-}
+// Live database tests strictly require TEST_DATABASE_URL to be explicitly configured.
+// They NEVER fall back to DATABASE_URL or .env.local, isolating production databases.
+const testConnectionString = process.env.TEST_DATABASE_URL || '';
+const hasTestDb = Boolean(testConnectionString);
 
 describe('Phase 3: Product Catalogue & Dynamic Storefront Integration', () => {
   describe('1. Storefront Product Loading & Inactive Isolation', () => {
@@ -93,11 +91,14 @@ describe('Phase 3: Product Catalogue & Dynamic Storefront Integration', () => {
   });
 
   describe('3. Customer Rejection from Admin Product Management', () => {
-    test('direct PostgreSQL database grants strictly deny customer UPDATE or INSERT on products', async () => {
-      const pool = new pg.Pool({
-        connectionString,
-        ssl: { rejectUnauthorized: false },
-      });
+    test(
+      'direct PostgreSQL database grants strictly deny customer UPDATE or INSERT on products',
+      { skip: !hasTestDb ? 'Skipped: TEST_DATABASE_URL not set' : false },
+      async () => {
+        const pool = new pg.Pool({
+          connectionString: testConnectionString,
+          ssl: { rejectUnauthorized: false },
+        });
 
       const client = await pool.connect();
       try {
@@ -139,11 +140,14 @@ describe('Phase 3: Product Catalogue & Dynamic Storefront Integration', () => {
   });
 
   describe('4. Price & MRP Validation Rules', () => {
-    test('enforces MRP >= selling price constraint in database', async () => {
-      const pool = new pg.Pool({
-        connectionString,
-        ssl: { rejectUnauthorized: false },
-      });
+    test(
+      'enforces MRP >= selling price constraint in database',
+      { skip: !hasTestDb ? 'Skipped: TEST_DATABASE_URL not set' : false },
+      async () => {
+        const pool = new pg.Pool({
+          connectionString: testConnectionString,
+          ssl: { rejectUnauthorized: false },
+        });
 
       const client = await pool.connect();
       try {
@@ -204,11 +208,14 @@ describe('Phase 3: Product Catalogue & Dynamic Storefront Integration', () => {
       );
     });
 
-    test('re-running seed does not overwrite admin-updated price or stock', async () => {
-      const pool = new pg.Pool({
-        connectionString,
-        ssl: { rejectUnauthorized: false },
-      });
+    test(
+      're-running seed does not overwrite admin-updated price or stock',
+      { skip: !hasTestDb ? 'Skipped: TEST_DATABASE_URL not set' : false },
+      async () => {
+        const pool = new pg.Pool({
+          connectionString: testConnectionString,
+          ssl: { rejectUnauthorized: false },
+        });
 
       const client = await pool.connect();
       try {
@@ -367,11 +374,14 @@ describe('Phase 3: Product Catalogue & Dynamic Storefront Integration', () => {
       assert.equal(orderSubtotal, 549 * 2, 'Server calculates order total directly from database row');
     });
 
-    test('live database transaction supports inserting and querying a database-only product', async () => {
-      const pool = new pg.Pool({
-        connectionString,
-        ssl: { rejectUnauthorized: false },
-      });
+    test(
+      'live database transaction supports inserting and querying a database-only product',
+      { skip: !hasTestDb ? 'Skipped: TEST_DATABASE_URL not set' : false },
+      async () => {
+        const pool = new pg.Pool({
+          connectionString: testConnectionString,
+          ssl: { rejectUnauthorized: false },
+        });
 
       const client = await pool.connect();
       try {
