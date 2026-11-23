@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getRazorpayKeyId } from '@/lib/payment-verify';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -18,8 +19,14 @@ export async function GET(request: Request) {
     Boolean(val && val.trim() !== '' && !val.includes('placeholder') && !val.includes('your_'));
 
   const supabaseUrlPresent = isPresent(process.env.NEXT_PUBLIC_SUPABASE_URL);
-  const supabaseAnonPresent = isPresent(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-  const supabaseServicePresent = isPresent(process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const supabaseKeyPresent = isPresent(
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+  const supabaseServicePresent = isPresent(
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
 
   const googlePresent = isPresent(process.env.GOOGLE_CLIENT_ID) ||
     process.env.NEXT_PUBLIC_GOOGLE_AUTH_CONFIGURED === 'true';
@@ -30,11 +37,11 @@ export async function GET(request: Request) {
   const emailPresent = isPresent(process.env.EMAIL_PROVIDER_API_KEY) ||
     isPresent(process.env.RESEND_API_KEY);
 
-  const razorpayKeyPresent = isPresent(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
+  const razorpayKeyPresent = isPresent(getRazorpayKeyId());
   const razorpaySecretPresent = isPresent(process.env.RAZORPAY_KEY_SECRET);
 
   const services = {
-    supabase: supabaseUrlPresent && supabaseAnonPresent,
+    supabase: supabaseUrlPresent && supabaseKeyPresent,
     supabaseServiceRole: supabaseServicePresent,
     googleAuth: googlePresent,
     sms: smsPresent,

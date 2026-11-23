@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getProductBySlug } from '@/data/products';
+import { getProductBySlug, ProductQueryError } from '@/lib/products';
+import { createUpdateCartSchema } from '@/lib/cart-schema';
+
+// Strict Zod schema for cart mutations (validates slug format only; existence checked in handlers)
+export const updateCartSchema = createUpdateCartSchema();
+
+interface RawCartItem {
+  slug?: string;
+  quantity?: number;
+}
 
 export async function GET() {
   try {
@@ -25,16 +34,18 @@ export async function GET() {
       console.warn('[Cart Fetch Error]', error);
     }
 
-    const rawItems: Array<{ slug: string; quantity: number }> =
-      cartRecord?.items && Array.isArray(cartRecord.items) ? cartRecord.items : [];
+    const rawItems: RawCartItem[] =
+      cartRecord?.items && Array.isArray(cartRecord.items)
+        ? (cartRecord.items as RawCartItem[])
+        : [];
 
     const validatedItems = [];
     let droppedCount = 0;
 
     for (const raw of rawItems) {
       if (!raw || !raw.slug) continue;
-      const product = getProductBySlug(raw.slug);
-      if (!product) {
+      const product = await getProductBySlug(raw.slug);
+      if (!product || product.isActive === false) {
         droppedCount += 1;
         continue;
       }
@@ -62,7 +73,14 @@ export async function GET() {
       items: validatedItems,
       droppedCount,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    if (err instanceof ProductQueryError) {
+      console.error('[Cart GET] Product catalogue query failed:', err.message);
+      return NextResponse.json(
+        { error: 'Product catalogue is temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      );
+    }
     console.error('[Cart GET Exception]', err);
     return NextResponse.json({ items: [], droppedCount: 0 });
   }
@@ -79,15 +97,33 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const rawItems = Array.isArray(body?.items) ? body.items : [];
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
+    }
 
-    const cleanItems = rawItems
-      .filter((i: any) => i && typeof i.slug === 'string')
-      .map((i: any) => ({
-        slug: i.slug,
-        quantity: Math.min(10, Math.max(1, Number(i.quantity) || 1)),
-      }));
+    const validation = updateCartSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.issues[0].message, issues: validation.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const { items: cleanItems } = validation.data;
+
+    // Reject inactive products from being persisted in the cart
+    for (const item of cleanItems) {
+      const prod = await getProductBySlug(item.slug);
+      if (!prod || prod.isActive === false) {
+        return NextResponse.json(
+          { error: `Product is not available for purchase: ${item.slug}` },
+          { status: 400 }
+        );
+      }
+    }
 
     const adminSupabase = createAdminClient();
     const { error } = await adminSupabase.from('carts').upsert({
@@ -101,10 +137,17 @@ export async function PUT(request: Request) {
     }
 
     return NextResponse.json({ success: true, count: cleanItems.length });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    if (err instanceof ProductQueryError) {
+      console.error('[Cart PUT] Product catalogue query failed:', err.message);
+      return NextResponse.json(
+        { error: 'Product catalogue is temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      );
+    }
     console.error('[Cart PUT Exception]', err);
     return NextResponse.json(
-      { error: err.message || 'Failed to save cart' },
+      { error: 'Failed to save cart. Please try again later.' },
       { status: 500 }
     );
   }
@@ -125,10 +168,10 @@ export async function DELETE() {
     await adminSupabase.from('carts').delete().eq('user_id', user.id);
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[Cart DELETE Exception]', err);
     return NextResponse.json(
-      { error: err.message || 'Failed to clear cart' },
+      { error: 'Failed to clear cart. Please try again later.' },
       { status: 500 }
     );
   }

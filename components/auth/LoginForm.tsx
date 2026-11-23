@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/client';
 import { useCartStore, saveCartBeforeOAuth } from '@/lib/cart';
+import { sanitizeNext } from '@/lib/auth-helpers';
 import OtpInput from './OtpInput';
 
 const emailSchema = z.string().email('Please enter a valid email address');
@@ -14,7 +15,7 @@ const phoneSchema = z.string().regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-di
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextUrl = searchParams.get('next') || '/account';
+  const nextUrl = sanitizeNext(searchParams.get('next'));
 
   const [authMode, setAuthMode] = useState<'email' | 'phone'>('email');
   const [step, setStep] = useState<'request' | 'verify'>('request');
@@ -27,7 +28,9 @@ export default function LoginForm() {
 
   // Check client-side configuration states
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const isSupabaseConfigured = Boolean(
     supabaseUrl &&
     supabaseKey &&
@@ -75,11 +78,12 @@ export default function LoginForm() {
         },
       });
       if (error) throw error;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : '';
       setErrorMessage(
-        err.message?.includes('provider is not enabled')
+        msg.includes('provider is not enabled')
           ? 'Google sign-in is not enabled in the Supabase dashboard yet.'
-          : err.message || 'Google sign-in is not configured yet.'
+          : msg || 'Google sign-in is not configured yet.'
       );
       setLoading(false);
     }
@@ -140,8 +144,9 @@ export default function LoginForm() {
       setStep('verify');
       setCooldown(30);
       setOtpCode('');
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Unable to send verification code. Please try again.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : '';
+      setErrorMessage(msg || 'Unable to send verification code. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -186,8 +191,9 @@ export default function LoginForm() {
       // Redirect to next destination
       router.push(nextUrl);
       router.refresh();
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Invalid or expired verification code. Please check and try again.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : '';
+      setErrorMessage(msg || 'Invalid or expired verification code. Please check and try again.');
       setLoading(false);
     }
   };

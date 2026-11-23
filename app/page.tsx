@@ -5,11 +5,18 @@ import WhyDrRias from '@/components/home/WhyDrRias';
 import FAQ from '@/components/home/FAQ';
 import Newsletter from '@/components/home/Newsletter';
 import ProductCard from '@/components/ui/ProductCard';
-import { getAllProducts } from '@/data/products';
+import { getAllProducts } from '@/lib/products';
+import type { Product } from '@/data/products';
 import Link from 'next/link';
 
-export default function Home() {
-  const allProducts = getAllProducts();
+export default async function Home() {
+  'use cache';
+  let allProducts: Product[] = [];
+  try {
+    allProducts = await getAllProducts();
+  } catch (err) {
+    console.warn('[HomePage] Could not query live products from database:', err);
+  }
 
   return (
     <>

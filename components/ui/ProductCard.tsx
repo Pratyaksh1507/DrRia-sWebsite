@@ -100,23 +100,46 @@ export default function ProductCard({
         <div className="pt-2 flex items-center justify-between border-t border-[#F3EBDD]">
           <div>
             <span className="block text-[11px] uppercase tracking-wider text-[#6B6B6B]">Price</span>
-            <span className="font-semibold text-base sm:text-lg text-[#5C3D1E]">
-              ₹{product.price.toLocaleString('en-IN')}
-            </span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-semibold text-base sm:text-lg text-[#5C3D1E]">
+                ₹{product.price.toLocaleString('en-IN')}
+              </span>
+              {product.mrp && product.mrp > product.price && (
+                <>
+                  <span className="text-xs line-through text-[#6B6B6B]/80">
+                    ₹{product.mrp.toLocaleString('en-IN')}
+                  </span>
+                  <span className="text-[10px] font-bold text-[#C9952A]">
+                    {product.discountPercentage || Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+                  </span>
+                </>
+              )}
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              addItem(product, 1);
-            }}
-            className="relative z-10 inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-semibold bg-[#5C3D1E] text-white hover:bg-[#C9952A] focus:outline-none focus:ring-2 focus:ring-[#5C3D1E] transition-colors shadow-xs"
-            aria-label={`Add ${product.name} to cart`}
-          >
-            Add to Cart
-          </button>
+          {product.inStock && (product.stockQuantity === undefined || product.stockQuantity > 0) && product.isActive !== false ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                addItem(product, 1);
+              }}
+              className="relative z-10 inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-semibold bg-[#5C3D1E] text-white hover:bg-[#C9952A] focus:outline-none focus:ring-2 focus:ring-[#5C3D1E] transition-colors shadow-xs"
+              aria-label={`Add ${product.name} to cart`}
+            >
+              Add to Cart
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="relative z-10 inline-flex items-center justify-center px-3 py-2 rounded-xl text-xs font-semibold bg-[#E8E0D5] text-[#6B6B6B] cursor-not-allowed shadow-none"
+              aria-label={`${product.name} is sold out`}
+            >
+              Sold Out
+            </button>
+          )}
         </div>
       </div>
     </article>

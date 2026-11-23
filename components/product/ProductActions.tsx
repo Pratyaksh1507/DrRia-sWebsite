@@ -14,11 +14,18 @@ export default function ProductActions({ product }: ProductActionsProps) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
 
+  const isAvailable =
+    product.inStock &&
+    (product.stockQuantity === undefined || product.stockQuantity > 0) &&
+    product.isActive !== false;
+
   const handleAddToCart = () => {
+    if (!isAvailable) return;
     addItem(product, quantity);
   };
 
   const handleBuyNow = () => {
+    if (!isAvailable) return;
     addItem(product, quantity);
     router.push('/checkout');
   };
@@ -34,50 +41,69 @@ export default function ProductActions({ product }: ProductActionsProps) {
     <>
       <div className="space-y-4 pt-2">
         {/* Quantity selector */}
-        <div className="flex items-center gap-4">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
-            Quantity
-          </span>
-          <div className="flex items-center border border-[#E8E0D5] rounded-xl bg-white shadow-2xs">
-            <button
-              type="button"
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              disabled={quantity <= 1}
-              aria-label="Decrease quantity"
-              className="px-3 py-2 text-sm font-bold text-[#5C3D1E] hover:bg-[#F3EBDD] rounded-l-xl disabled:opacity-40"
-            >
-              −
-            </button>
-            <span className="px-4 text-sm font-bold text-[#1A1A1A]">{quantity}</span>
-            <button
-              type="button"
-              onClick={() => setQuantity((q) => Math.min(10, q + 1))}
-              disabled={quantity >= 10}
-              aria-label="Increase quantity"
-              className="px-3 py-2 text-sm font-bold text-[#5C3D1E] hover:bg-[#F3EBDD] rounded-r-xl disabled:opacity-40"
-            >
-              +
-            </button>
+        {isAvailable && (
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">
+              Quantity
+            </span>
+            <div className="flex items-center border border-[#E8E0D5] rounded-xl bg-white shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                disabled={quantity <= 1}
+                aria-label="Decrease quantity"
+                className="px-3 py-2 text-sm font-bold text-[#5C3D1E] hover:bg-[#F3EBDD] rounded-l-xl disabled:opacity-40"
+              >
+                −
+              </button>
+              <span className="px-4 text-sm font-bold text-[#1A1A1A]">{quantity}</span>
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.min(10, q + 1))}
+                disabled={quantity >= 10 || (product.stockQuantity !== undefined && quantity >= product.stockQuantity)}
+                aria-label="Increase quantity"
+                className="px-3 py-2 text-sm font-bold text-[#5C3D1E] hover:bg-[#F3EBDD] rounded-r-xl disabled:opacity-40"
+              >
+                +
+              </button>
+            </div>
+            {product.stockQuantity !== undefined && product.stockQuantity > 0 && product.stockQuantity <= 5 && (
+              <span className="text-xs font-semibold text-amber-700">
+                Only {product.stockQuantity} remaining
+              </span>
+            )}
           </div>
-        </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            className="flex-1 py-3.5 px-6 rounded-xl bg-[#5C3D1E] text-white text-sm font-semibold hover:bg-[#7A532B] transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[#5C3D1E]"
-          >
-            Add to Cart &bull; ₹{(product.price * quantity).toLocaleString('en-IN')}
-          </button>
+          {isAvailable ? (
+            <>
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="flex-1 py-3.5 px-6 rounded-xl bg-[#5C3D1E] text-white text-sm font-semibold hover:bg-[#7A532B] transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[#5C3D1E]"
+              >
+                Add to Cart &bull; ₹{(product.price * quantity).toLocaleString('en-IN')}
+              </button>
 
-          <button
-            type="button"
-            onClick={handleBuyNow}
-            className="flex-1 py-3.5 px-6 rounded-xl bg-[#C9952A] text-white text-sm font-semibold hover:bg-[#B28221] transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C9952A]"
-          >
-            Buy Now
-          </button>
+              <button
+                type="button"
+                onClick={handleBuyNow}
+                className="flex-1 py-3.5 px-6 rounded-xl bg-[#C9952A] text-white text-sm font-semibold hover:bg-[#B28221] transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C9952A]"
+              >
+                Buy Now
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="w-full py-3.5 px-6 rounded-xl bg-[#E8E0D5] text-[#6B6B6B] text-sm font-semibold cursor-not-allowed shadow-none"
+            >
+              Currently Out of Stock
+            </button>
+          )}
         </div>
 
         {/* WhatsApp Order Fallback */}

@@ -72,6 +72,10 @@ export default function Header() {
     { href: '/contact', label: 'Contact' },
   ];
 
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-40 w-full bg-[#FBF6EE]/95 backdrop-blur-md border-b border-[#E8E0D5] transition-all">
       {/* Top Notification Bar */}

@@ -1,12 +1,15 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getAllProducts, getProductBySlug, getRelatedProducts } from '@/data/products';
+import { getAllProducts, getProductBySlug, getRelatedProducts } from '@/lib/products';
+import type { Product } from '@/data/products';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductAccordions from '@/components/product/ProductAccordions';
+import ProductReviewsSection from '@/components/product/ProductReviewsSection';
 import ProductSchema from '@/components/product/ProductSchema';
 import ProductCard from '@/components/ui/ProductCard';
+import { getSiteUrl } from '@/lib/site-url';
 
 interface ProductPageProps {
   params: Promise<{
@@ -15,15 +18,33 @@ interface ProductPageProps {
 }
 
 export async function generateStaticParams() {
-  const products = getAllProducts();
-  return products.map((product) => ({
-    slug: product.slug,
-  }));
+  try {
+    const products = await getAllProducts();
+    if (products.length > 0) {
+      return products.map((product) => ({
+        slug: product.slug,
+      }));
+    }
+  } catch (err) {
+    console.warn('[generateStaticParams] Could not fetch products during build (e.g. database paused):', err);
+  }
+  return [
+    { slug: 'anti-pigmentation-lip-balm' },
+    { slug: 'vita-c-daily-glow-face-wash' },
+    { slug: 'hydroboost-face-moisturizer' },
+    { slug: 'spf50-sunscreen' },
+  ];
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  'use cache';
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  let product: Product | undefined;
+  try {
+    product = await getProductBySlug(slug);
+  } catch {
+    // Database offline/paused
+  }
 
   if (!product) {
     return {
@@ -39,7 +60,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     openGraph: {
       title: `${product.name} | Dr Ria's`,
       description: product.description,
-      url: `https://drrias.in/products/${product.slug}`,
+      url: `${getSiteUrl()}/products/${product.slug}`,
       images: [
         {
           url: primaryImg,
@@ -59,14 +80,20 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
+  'use cache';
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  let product: Product | undefined;
+  try {
+    product = await getProductBySlug(slug);
+  } catch (err) {
+    console.warn(`[ProductPage] Could not query product ${slug} (database paused/offline):`, err);
+  }
 
-  if (!product) {
+  if (!product || product.isActive === false) {
     notFound();
   }
 
-  const related = getRelatedProducts(product.slug, 3);
+  const related = await getRelatedProducts(product.slug, 3);
 
   return (
     <>
@@ -127,21 +154,58 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <p className="mt-2 text-sm sm:text-base text-[#5C3D1E] font-medium">
                   {product.tagline}
                 </p>
+
+                {/* Rating & Review Jump Anchor */}
+                <div className="mt-2.5 flex items-center gap-2 text-xs">
+                  <a
+                    href="#reviews"
+                    className="inline-flex items-center gap-1.5 text-[#5C3D1E] hover:underline font-medium"
+                    aria-label={`Rated ${product.rating || 5.0} out of 5 stars based on ${product.reviewsCount || 0} reviews. Click to view customer reviews.`}
+                  >
+                    <span className="font-bold text-[#1A1A1A]">{product.rating || 5.0}</span>
+                    <svg className="w-3.5 h-3.5 text-[#C9952A] fill-current" viewBox="0 0 20 20" aria-hidden="true">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span className="text-[#6B6B6B]">
+                      ({product.reviewsCount || 0} {product.reviewsCount === 1 ? 'review' : 'reviews'})
+                    </span>
+                  </a>
+                </div>
               </div>
 
               {/* Price Row (Rendered in Server HTML for crawlers and shopping agents) */}
               <div className="p-4 rounded-2xl bg-white border border-[#E8E0D5] flex items-baseline justify-between shadow-2xs">
                 <div>
                   <span className="block text-[11px] uppercase tracking-wider text-[#6B6B6B]">
-                    M.R.P. (Incl. of all taxes)
+                    Price (Incl. of all taxes)
                   </span>
-                  <span className="font-serif text-2xl sm:text-3xl font-bold text-[#5C3D1E]">
-                    ₹{product.price.toLocaleString('en-IN')}
-                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-serif text-2xl sm:text-3xl font-bold text-[#5C3D1E]">
+                      ₹{product.price.toLocaleString('en-IN')}
+                    </span>
+                    {product.mrp && product.mrp > product.price && (
+                      <>
+                        <span className="text-sm line-through text-[#6B6B6B]/80">
+                          ₹{product.mrp.toLocaleString('en-IN')}
+                        </span>
+                        <span className="text-xs font-bold text-[#C9952A]">
+                          {product.discountPercentage || Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#EDF6EE] text-[#3A7D44]">
-                  In Stock &bull; Dispatches in 24h
-                </span>
+                {product.inStock ? (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#EDF6EE] text-[#3A7D44]">
+                    {product.stockQuantity !== undefined && product.stockQuantity > 0 && product.stockQuantity <= 5
+                      ? `Only ${product.stockQuantity} left &bull; Dispatches in 24h`
+                      : 'In Stock &bull; Dispatches in 24h'}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700">
+                    Out of Stock
+                  </span>
+                )}
               </div>
 
               {/* Description */}
@@ -162,6 +226,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
             </div>
           </div>
+
+          {/* Customer Reviews Section */}
+          <ProductReviewsSection
+            productSlug={product.slug}
+            productName={product.name}
+            initialRating={product.rating}
+            initialReviewsCount={product.reviewsCount}
+          />
 
           {/* Related Formulations */}
           {related.length > 0 && (

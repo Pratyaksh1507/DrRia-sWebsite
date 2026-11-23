@@ -9,6 +9,7 @@ import { useCartStore } from '@/lib/cart';
 import { processRazorpayPayment } from '@/lib/razorpay';
 import { createClient } from '@/lib/supabase/client';
 import LoginForm from '@/components/auth/LoginForm';
+import { calculateGstBreakdown } from '@/lib/gst';
 
 interface SavedAddress {
   id: string;
@@ -48,6 +49,17 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Coupon state
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountAmount: number;
+    discountType: string;
+    discountValue: number;
+  } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
 
   const supabase = createClient();
 
@@ -142,6 +154,51 @@ export default function CheckoutPage() {
   };
 
   const cartTotal = total();
+  const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+  const finalTotal = Math.max(0, cartTotal - discountAmount);
+  const gstBreakdown = calculateGstBreakdown(finalTotal, formData.state);
+
+  const handleApplyCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!couponInput.trim()) return;
+    if (!user) {
+      setCouponError('Please sign in to your Dr Ria’s account above to apply coupons.');
+      return;
+    }
+    setCouponLoading(true);
+    setCouponError('');
+    try {
+      const res = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: couponInput.trim(),
+          subtotal: cartTotal,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.valid) {
+        throw new Error(data.error || 'Invalid or expired coupon code.');
+      }
+      setAppliedCoupon({
+        code: data.code,
+        discountAmount: data.discountAmount,
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+      });
+      setCouponError('');
+    } catch (err: unknown) {
+      setCouponError(err instanceof Error ? err.message : 'Failed to apply coupon.');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput('');
+    setCouponError('');
+  };
 
   const validate = () => {
     const err: Record<string, string> = {};
@@ -207,6 +264,7 @@ export default function CheckoutPage() {
           },
           paymentMethod: formData.paymentMethod,
           idempotencyKey,
+          couponCode: appliedCoupon?.code,
         }),
       });
 
@@ -245,8 +303,18 @@ export default function CheckoutPage() {
             });
 
             const verifyData = await verifyRes.json();
-            if (!verifyRes.ok) {
-              throw new Error(verifyData.error || 'Payment signature verification failed.');
+
+            // Handle payment received on cancelled order
+            if (verifyData.code === 'ORDER_CANCELLED_PAYMENT_RECEIVED') {
+              clearCart();
+              router.push(
+                `/thank-you?orderId=${orderData.orderId}&status=cancelled_payment&paymentId=${rzpRes.razorpay_payment_id}`
+              );
+              return;
+            }
+
+            if (!verifyRes.ok || !verifyData.success) {
+              throw new Error(verifyData.error || verifyData.message || 'Payment signature verification failed.');
             }
 
             clearCart();
@@ -771,11 +839,67 @@ export default function CheckoutPage() {
               ))}
             </div>
 
+            {/* Promo Code Input & Application */}
+            <div className="pt-4 border-t border-[#F3EBDD] space-y-2">
+              <label className="block text-xs font-semibold text-[#5C3D1E]">
+                Promo / Coupon Code
+              </label>
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#EDF6EE] border border-[#C5E5C9] text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-[#3A7D44] uppercase tracking-wide">
+                      {appliedCoupon.code}
+                    </span>
+                    <span className="text-[11px] text-[#3A7D44]">
+                      (-₹{appliedCoupon.discountAmount.toLocaleString('en-IN')})
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-xs text-red-600 hover:text-red-800 font-semibold"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponInput}
+                    onChange={(e) => {
+                      setCouponInput(e.target.value);
+                      if (couponError) setCouponError('');
+                    }}
+                    placeholder="Enter code (e.g. WELCOME10)"
+                    className="flex-1 px-3 py-1.5 rounded-xl border border-[#E8E0D5] text-xs uppercase font-mono bg-[#FAF5EA]/50 focus:outline-none focus:ring-2 focus:ring-[#C9952A]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading || !couponInput.trim()}
+                    className="px-4 py-1.5 rounded-xl bg-[#5C3D1E] text-white text-xs font-semibold hover:bg-[#7A532B] disabled:opacity-50 transition-colors"
+                  >
+                    {couponLoading ? 'Checking...' : 'Apply'}
+                  </button>
+                </div>
+              )}
+              {couponError && (
+                <p className="text-[11px] text-red-600 font-medium">{couponError}</p>
+              )}
+            </div>
+
             <div className="pt-4 border-t border-[#F3EBDD] space-y-2 text-xs">
               <div className="flex justify-between text-[#6B6B6B]">
                 <span>Items Subtotal</span>
                 <span>₹{cartTotal.toLocaleString('en-IN')}</span>
               </div>
+              {appliedCoupon && (
+                <div className="flex justify-between text-[#3A7D44] font-medium">
+                  <span>Coupon Discount ({appliedCoupon.code})</span>
+                  <span>-₹{appliedCoupon.discountAmount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
               <div className="flex justify-between text-[#6B6B6B]">
                 <span>Delivery Charges</span>
                 {STORE_CONFIG.ENABLE_FREE_SHIPPING_PROMO ? (
@@ -786,7 +910,14 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between text-base font-bold text-[#1A1A1A] pt-3 border-t border-[#F3EBDD]">
                 <span>Total Due</span>
-                <span className="text-[#5C3D1E]">₹{cartTotal.toLocaleString('en-IN')}</span>
+                <span className="text-[#5C3D1E]">₹{finalTotal.toLocaleString('en-IN')}</span>
+              </div>
+              <div className="text-[11px] text-[#6B6B6B] pt-1">
+                Includes ₹{gstBreakdown.totalTax.toFixed(2)} 18% GST (
+                {gstBreakdown.isInterState
+                  ? `IGST ₹${gstBreakdown.igst.toFixed(2)}`
+                  : `CGST ₹${gstBreakdown.cgst.toFixed(2)} + SGST ₹${gstBreakdown.sgst.toFixed(2)}`}
+                )
               </div>
             </div>
 

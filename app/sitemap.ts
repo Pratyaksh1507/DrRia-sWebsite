@@ -1,9 +1,15 @@
 import { MetadataRoute } from 'next';
-import { getAllProducts } from '@/data/products';
+import { getAllProducts } from '@/lib/products';
+import { getSiteUrl } from '@/lib/site-url';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://drrias.in';
-  const products = getAllProducts();
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = getSiteUrl();
+  let products: Awaited<ReturnType<typeof getAllProducts>> = [];
+  try {
+    products = await getAllProducts();
+  } catch (err) {
+    console.warn('[sitemap] Could not query live products for sitemap:', err);
+  }
   const buildDate = '2026-11-02';
 
   const productEntries: MetadataRoute.Sitemap = products.map((product) => ({

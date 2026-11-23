@@ -13,21 +13,25 @@ create table if not exists public.carts (
 alter table public.carts enable row level security;
 
 -- Row Level Security Policies (users can only access their own cart)
+drop policy if exists "Users can read own cart" on public.carts;
 create policy "Users can read own cart"
   on public.carts
   for select
   using (auth.uid() = user_id);
 
+drop policy if exists "Users can insert own cart" on public.carts;
 create policy "Users can insert own cart"
   on public.carts
   for insert
   with check (auth.uid() = user_id);
 
+drop policy if exists "Users can update own cart" on public.carts;
 create policy "Users can update own cart"
   on public.carts
   for update
   using (auth.uid() = user_id);
 
+drop policy if exists "Users can delete own cart" on public.carts;
 create policy "Users can delete own cart"
   on public.carts
   for delete
@@ -42,8 +46,8 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists handle_cart_updated_at on public.carts;
 create trigger handle_cart_updated_at
   before update on public.carts
   for each row
   execute function public.handle_updated_at();
-

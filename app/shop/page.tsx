@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { getAllProducts } from '@/data/products';
+import { getAllProducts } from '@/lib/products';
+import type { Product } from '@/data/products';
 import ShopClient from './ShopClient';
 
 export const metadata: Metadata = {
@@ -14,8 +15,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ShopPage() {
-  const products = getAllProducts();
+export default async function ShopPage() {
+  'use cache';
+  let products: Product[] = [];
+  try {
+    products = await getAllProducts();
+  } catch (err) {
+    console.warn('[ShopPage] Could not query live products from database:', err);
+  }
 
   return (
     <div className="py-12 sm:py-16 bg-[#FBF6EE]">

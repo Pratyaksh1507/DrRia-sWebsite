@@ -24,7 +24,7 @@ interface OrderEmailParams {
 
 export async function sendOrderConfirmationEmail(params: OrderEmailParams) {
   const { toEmail, customerName, orderId, total, items, address } = params;
-  const resendApiKey = process.env.RESEND_API_KEY;
+  const resendApiKey = process.env.RESEND_API_KEY || process.env.EMAIL_PROVIDER_API_KEY;
 
   const itemsListHtml = items
     .map(
